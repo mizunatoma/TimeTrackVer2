@@ -1,0 +1,24 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  background-color: #F2F0E9; 
+  color: #4B4B4B;            
+}
+
+@layer components {
+  /* 認証ページ用の共通スタイル */
+  .auth-container{@apply min-h-screen grid grid-cols-1 lg:grid-cols-2}
+  .auth-form-section{@apply flex items-center justify-center bg-[#F2F0E9] p-8 h-full}
+  .auth-card { @apply w-full max-w-md bg-white rounded-2xl shadow-md border border-gray-200 p-8 min-h-[448px] }
+  .auth-title{@apply text-2xl font-bold text-center mb-8 text-gray-900}
+  .accunt_button {@apply w-full rounded-lg px-5 py-2.5 text-center text-sm bg-white text-[#5A8B7D] border border-[#5A8B7D] hover:bg-[#F2F0E9];}
+
+  /* timelineページ用の共通スタイル */
+  .widget-card { @apply w-full bg-white rounded-2xl p-6 shadow-sm shadow-sm}
+  .section-title{@apply text-gray-600 font-bold mb-4 text-sm}
+  .button{@apply px-6 py-1.5 rounded-full text-xs font-bold transition-colors}
+  .text{@apply text-gray-600 font-bold text-sm}
+  
+}
