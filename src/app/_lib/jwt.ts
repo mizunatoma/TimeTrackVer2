@@ -17,7 +17,7 @@ export async function signJWT(userId: string) {
 // verifyJWT(token) → JWTを検証して中身を返す関数
 export async function jwtVerify(token: string) {
   const secret = new TextEncoder().encode(process.env.JWT_SECRET)
-  const { payload } = await jose.jwtVerify(token, secret, {
+  const { payload } = await jose.jwtVerify<{ userId: string }>(token, secret, {
     issuer: 'urn:example:issuer',
     audience: 'urn:example:audience',
   })

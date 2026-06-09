@@ -19,8 +19,7 @@ export const POST = async (request: NextRequest) => {
   try {
     // signJWT(userId) でJWTを発行
     const jwt = await signJWT(user.id)
-    // 5. Cookieにセットして返す
-    // パスワードの確認
+    // Cookieにセットして返す
     const cookieStore = await cookies()
     cookieStore.set('jwt', jwt, { ...JWT_COOKIE_OPTIONS })
     return NextResponse.json({ message: 'ok' })
