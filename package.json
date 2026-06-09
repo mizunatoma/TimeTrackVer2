@@ -12,7 +12,9 @@
     "@hookform/resolvers": "^5.2.2",
     "@supabase/ssr": "^0.8.0",
     "@supabase/supabase-js": "^2.106.2",
+    "bcryptjs": "^3.0.3",
     "dotenv": "^17.2.3",
+    "jose": "^6.2.3",
     "lucide-react": "^0.577.0",
     "next": "^14.2.16",
     "pg": "^8.16.3",
@@ -26,6 +28,7 @@
   },
   "devDependencies": {
     "@prisma/client": "^6.19.1",
+    "@types/bcryptjs": "^2.4.6",
     "@types/node": "^20",
     "@types/pg": "^8.16.0",
     "@types/react": "^18",
