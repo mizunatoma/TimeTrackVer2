@@ -10,8 +10,6 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
-    "@supabase/ssr": "^0.8.0",
-    "@supabase/supabase-js": "^2.106.2",
     "bcryptjs": "^3.0.3",
     "dotenv": "^17.2.3",
     "jose": "^6.2.3",
