@@ -1,33 +1,29 @@
-import { NextResponse, type NextRequest } from 'next/server'
-import { jwtVerify } from './app/_lib/jwt'
-
-// ホワイト(ログイン不要)リスト定義
-const PUBLIC_PATH = ['/login', '/signup', '/api/auth/guest']
+import { NextRequest, NextResponse } from "next/server";
+import { jwtVerify } from "./app/_lib/jwt";
 
 export const middleware = async (request: NextRequest) => {
-  const isPublic = PUBLIC_PATH.some((path) =>
-    request.nextUrl.pathname.startsWith(path)
-  )
-
-  // 公開パスはそのまま通す(早期リターン)
+   // 公開パスはそのまま通す(早期リターン)
+  const PUBLIC_PATH = ['/signup', '/signin', '/api/auth/guest']
+  const isPublic = PUBLIC_PATH.some((path) => request.nextUrl.pathname.startsWith(path))
   if (isPublic) return NextResponse.next({ request })
 
-  const token = await request.cookies.get('jwt')
-  // トークンがなければ /login へリダイレクト
+  const token = request.cookies.get('jwt')
+  // token がなければ /login へリダイレクト
   if (!token) {
     const url = request.nextUrl.clone()
-    url.pathname = '/login'
+    url.pathname = '/signin'
     return NextResponse.redirect(url)
   }
 
+  // tokenを検証してリダイレクト
   try {
     await jwtVerify(token.value)
     return NextResponse.next({ request })
   } catch {
     const url = request.nextUrl.clone()
-    url.pathname = '/login'
+    url.pathname = '/signin'
     return NextResponse.redirect(url)
-  } 
+  }
 }
 
 export const config = {
