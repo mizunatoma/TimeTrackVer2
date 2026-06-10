@@ -1,47 +1,33 @@
-import { createServerClient } from '@supabase/ssr'
-import { type NextRequest, NextResponse } from 'next/server'
-import { COOKIE_OPTIONS } from './app/_lib/supabase/cookieOptions'
+import { NextResponse, type NextRequest } from 'next/server'
+import { jwtVerify } from './app/_lib/jwt'
 
-// ホワイトリスト定義
+// ホワイト(ログイン不要)リスト定義
 const PUBLIC_PATH = ['/login', '/signup', '/api/auth/guest']
 
 export const middleware = async (request: NextRequest) => {
-  const ref = { response: NextResponse.next({ request }) }
-
-  const supabase = createServerClient(
-    process.env.SUPABASE_URL!,
-    process.env.SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        // ブラウザから届いたcookieを取り出す
-        getAll: () => request.cookies.getAll(),
-        // 新しいcookieをレスポンスに乗せてブラウザに返す
-        setAll: (cookiesToSet) => {
-          ref.response = NextResponse.next({ request })
-          cookiesToSet.forEach(({ name, value, options }) =>
-            ref.response.cookies.set(name, value, {
-              ...options,
-              ...COOKIE_OPTIONS,
-            }),
-          )
-        },
-      },
-    },
+  const isPublic = PUBLIC_PATH.some((path) =>
+    request.nextUrl.pathname.startsWith(path)
   )
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  // 公開パスはそのまま通す(早期リターン)
+  if (isPublic) return NextResponse.next({ request })
 
-  if (
-    !user &&
-    !PUBLIC_PATH.some((path) => request.nextUrl.pathname.startsWith(path))
-  ) {
+  const token = await request.cookies.get('jwt')
+  // トークンがなければ /login へリダイレクト
+  if (!token) {
     const url = request.nextUrl.clone()
     url.pathname = '/login'
-    ref.response = NextResponse.redirect(url)
+    return NextResponse.redirect(url)
   }
-  return ref.response
+
+  try {
+    await jwtVerify(token.value)
+    return NextResponse.next({ request })
+  } catch {
+    const url = request.nextUrl.clone()
+    url.pathname = '/login'
+    return NextResponse.redirect(url)
+  } 
 }
 
 export const config = {
