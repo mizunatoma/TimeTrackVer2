@@ -21,15 +21,16 @@ export const POST = async (request: NextRequest) => {
   // resetToken と expirationDate をDBに保存
   await prisma.user.update({
     where: { email },
-    data: { resetToken, expirationDate: new Date(Date.now() + 60 * 60 * 1000) },
+    data: { resetToken, expirationDate: new Date(Date.now() + 60 * 60 * 1000) }, // 1h
   })
 
   // メール送信
+  const resetUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/api/auth/callback?token=${resetToken}`
   const { error } = await resend.emails.send({
     from: 'onboarding@resend.dev',
     to: user.email,
     subject: 'Hello world',
-    html: `<p>パスワードリセットは<a href="${process.env.NEXT_PUBLIC_SITE_URL}/api/auth/callback?token=${resetToken}">こちら</a></p>`
+    html: `パスワードリセットはこちら: ${resetUrl}`,
   });
   if (error) {
     return Response.json({ error });

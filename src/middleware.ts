@@ -2,13 +2,16 @@ import { NextRequest, NextResponse } from "next/server";
 import { jwtVerify } from "./app/_lib/jwt";
 
 export const middleware = async (request: NextRequest) => {
-  // ホワイトリスト（ログイン不要）
+  // ホワイトリスト（認証不要）
   const PUBLIC_PATH = [
     '/signup', 
+    '/api/auth/signup', 
     '/signin',
+    '/api/auth/signin', 
     '/reset-password', 
     '/api/auth/reset-password', 
     '/api/auth/callback', 
+    '/update-password', 
     '/api/auth/update-password', 
     '/api/auth/guest'
   ]

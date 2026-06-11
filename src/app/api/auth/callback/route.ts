@@ -5,7 +5,7 @@ import { NextRequest, NextResponse } from 'next/server'
 
 export const GET = async (request: NextRequest) => {
   try{
-    // resset-password で作成したtokenを検索 → どのユーザーか特定
+    // reset-password で作成したtokenを検索 → どのユーザーか特定
     const { searchParams } = request.nextUrl
     const token = searchParams.get('token')
     if (!token) {
@@ -13,8 +13,8 @@ export const GET = async (request: NextRequest) => {
       }
 
     const user = await prisma.user.findFirst({
-          where: { resetToken: token },
-        })
+      where: { resetToken: token },
+    })
     if (!user) {
       return NextResponse.json({ message: 'Unauthorized ' }, { status: 401 })
     }
