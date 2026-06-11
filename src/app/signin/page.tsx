@@ -94,7 +94,7 @@ export default function Page() {
 
             <div className="flex">
               <Link
-                href="/reset_password"
+                href="/reset-password"
                 className="ml-auto block text-sm text-[#5A8B7D] hover:underline"
               >
                 パスワードをお忘れの場合

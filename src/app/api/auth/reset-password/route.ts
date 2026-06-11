@@ -1,5 +1,8 @@
-import { prisma } from '@/app/_utils/prisma'
-import { NextRequest, NextResponse } from 'next/server'
+import { prisma } from '@/app/_utils/prisma';
+import { NextRequest, NextResponse } from 'next/server';
+import { Resend } from 'resend';
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 export const POST = async (request: NextRequest) => {
   const { email } = await request.json()
@@ -21,8 +24,20 @@ export const POST = async (request: NextRequest) => {
     data: { resetToken, expirationDate: new Date(Date.now() + 60 * 60 * 1000) },
   })
 
-  // メール送信 に書き換え予定
-  console.log(`${process.env.NEXT_PUBLIC_SITE_URL}/api/auth/callback?token=${resetToken}`)
+  // メール送信
+  const { error } = await resend.emails.send({
+    from: 'onboarding@resend.dev',
+    to: user.email,
+    subject: 'Hello world',
+    html: `<p>パスワードリセットは<a href="${process.env.NEXT_PUBLIC_SITE_URL}/api/auth/callback?token=${resetToken}">こちら</a></p>`
+  });
+  if (error) {
+    return Response.json({ error });
+  }
 
   return NextResponse.json({ message: 'ok' })
 }
+
+
+
+

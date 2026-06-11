@@ -2,8 +2,18 @@ import { NextRequest, NextResponse } from "next/server";
 import { jwtVerify } from "./app/_lib/jwt";
 
 export const middleware = async (request: NextRequest) => {
-   // 公開パスはそのまま通す(早期リターン)
-  const PUBLIC_PATH = ['/signup', '/signin', '/api/auth/guest']
+  // ホワイトリスト（ログイン不要）
+  const PUBLIC_PATH = [
+    '/signup', 
+    '/signin',
+    '/reset-password', 
+    '/api/auth/reset-password', 
+    '/api/auth/callback', 
+    '/api/auth/update-password', 
+    '/api/auth/guest'
+  ]
+  
+  // 公開パスはそのまま通す(早期リターン)
   const isPublic = PUBLIC_PATH.some((path) => request.nextUrl.pathname.startsWith(path))
   if (isPublic) return NextResponse.next({ request })
 
