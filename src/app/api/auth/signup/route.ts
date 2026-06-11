@@ -1,21 +1,22 @@
-import { createClient } from '@/app/_lib/supabase/createClient'
+import { prisma } from '@/app/_utils/prisma'
+import bcrypt from 'bcryptjs'
 import { NextRequest, NextResponse } from 'next/server'
 
 export const POST = async (request: NextRequest) => {
+  try{
   const { email, password } = await request.json()
-  const supabase = await createClient()
 
-  const { error } = await supabase.auth.signUp({
-    email,
-    password,
-    options: {
-      emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/login`,
-    },
+  // bcryptjs でパスワードをハッシュ化
+  const salt = bcrypt.genSaltSync(10)
+  const passwordHash = bcrypt.hashSync(password, salt)
+
+  // Prisma でDBにユーザーを保存
+  await prisma.user.create({
+    data: { passwordHash, email },
   })
 
-  if (error) {
-    return NextResponse.json({ message: error.message }, { status: 400 })
-  }
-
   return NextResponse.json({ message: 'ok' })
+  } catch (error) {
+    return NextResponse.json({ message: error }, { status: 400 })
+  }
 }

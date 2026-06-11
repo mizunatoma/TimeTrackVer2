@@ -65,7 +65,7 @@ export default function Page() {
       <AuthIllustration />
       <div className="auth-form-section">
         <div className="auth-card">
-          <h1 className="auth-title">Login</h1>
+          <h1 className="auth-title">ログイン</h1>
           <form
             method="POST"
             onSubmit={handleSubmit(onSubmit)}
@@ -94,7 +94,7 @@ export default function Page() {
 
             <div className="flex">
               <Link
-                href="/reset_password"
+                href="/reset-password"
                 className="ml-auto block text-sm text-[#5A8B7D] hover:underline"
               >
                 パスワードをお忘れの場合

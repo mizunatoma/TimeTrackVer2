@@ -1,5 +1,6 @@
 'use client'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import AuthIllustration from '../_components/AuthIllustration'
 import { FormButton } from '../_components/form/FormButton'
@@ -19,6 +20,7 @@ export default function Page() {
     reset,
     formState: { isSubmitting },
   } = useForm<LoginForm>()
+  const router = useRouter()
 
   const onSubmit = async (data: LoginForm) => {
     try {
@@ -33,7 +35,8 @@ export default function Page() {
         return
       }
       reset()
-      alert('確認メールを送信しました')
+      router.push('/signin')
+      alert('アカウントを作成しました')
     } catch (error) {
       console.log(error)
     }
@@ -44,7 +47,7 @@ export default function Page() {
       <AuthIllustration />
       <div className="auth-form-section">
         <div className="auth-card">
-          <h1 className="auth-title">Sign up</h1>
+          <h1 className="auth-title">新規登録</h1>
 
           <div className="">
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
@@ -95,7 +98,7 @@ export default function Page() {
               <p className="mt-4 text-center text-sm text-gray-600">
                 アカウントをお持ちの方は
                 <Link
-                  href="/login"
+                  href="/signin"
                   className="ml-1 text-[#5A8B7D] hover:underline"
                 >
                   こちら
