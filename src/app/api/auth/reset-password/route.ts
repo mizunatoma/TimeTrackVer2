@@ -1,44 +1,32 @@
-import { prisma } from '@/app/_utils/prisma';
-import { NextRequest, NextResponse } from 'next/server';
-import { Resend } from 'resend';
-
-const resend = new Resend(process.env.RESEND_API_KEY);
+import { authService } from '@/services/auth.service'
+import { NextRequest, NextResponse } from 'next/server'
 
 export const POST = async (request: NextRequest) => {
-  const { email } = await request.json()
+  try {
+    const { email } = await request.json()
+    // email でユーザーを検索
+    const user = await authService.findUser(email)
+    if (!user) {
+      return NextResponse.json({ message: 'Unauthorized' }, { status: 401 })
+    }
 
-  // email でユーザーを検索
-  const user = await prisma.user.findUnique({
-    where: { email },
-  })
-  if (!user) {
-    return NextResponse.json({ message: 'Unauthorized' }, { status: 401 })
+    // resetToken と expirationDate をDBに保存
+    const resetToken = await authService.resetPassword(email)
+
+    // メール送信
+    const { error } = await authService.sendResetPasswordMail(user, resetToken)
+    if (error) {
+      return Response.json(
+        { message: 'email could not be sent successfully' },
+        { status: 400 },
+      )
+    }
+
+    return NextResponse.json(null, { status: 200 })
+  } catch {
+    return NextResponse.json(
+      { message: 'Internal Server Error' },
+      { status: 500 },
+    )
   }
-
-  // ランダムな Token を生成
-  const resetToken = crypto.randomUUID()
-
-  // resetToken と expirationDate をDBに保存
-  await prisma.user.update({
-    where: { email },
-    data: { resetToken, expirationDate: new Date(Date.now() + 60 * 60 * 1000) }, // 1h
-  })
-
-  // メール送信
-  const resetUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/api/auth/callback?token=${resetToken}`
-  const { error } = await resend.emails.send({
-    from: 'onboarding@resend.dev',
-    to: user.email,
-    subject: 'Hello world',
-    html: `パスワードリセットはこちら: ${resetUrl}`,
-  });
-  if (error) {
-    return Response.json({ error });
-  }
-
-  return NextResponse.json({ message: 'ok' })
 }
-
-
-
-

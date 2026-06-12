@@ -1,31 +1,30 @@
-import { prisma } from '@/app/_utils/prisma'
+import { authService } from '@/services/auth.service'
 import { NextRequest, NextResponse } from 'next/server'
 
 // GET /api/auth/callback?token=xxx
 
 export const GET = async (request: NextRequest) => {
-  try{
+  try {
     // reset-password で作成したtokenを検索 → どのユーザーか特定
     const { searchParams } = request.nextUrl
     const token = searchParams.get('token')
     if (!token) {
-        return NextResponse.json({ message: 'Unauthorized ' }, { status: 401 })
-      }
+      return NextResponse.json({ message: 'Bad Request' }, { status: 400 })
+    }
 
-    const user = await prisma.user.findFirst({
-      where: { resetToken: token },
-    })
+    const user = await authService.findResetUser(token)
     if (!user) {
-      return NextResponse.json({ message: 'Unauthorized ' }, { status: 401 })
+      return NextResponse.json({ message: 'Not found' }, { status: 404 })
     }
 
-    // 有効期限チェック (nullable)
-    if (!user.expirationDate || user.expirationDate < new Date()) {
-      return NextResponse.json({ message: 'Token expired' }, { status: 401 })
-    }
     // OKなら → /update-passwordページへリダイレクト
-    return NextResponse.redirect(new URL(`/update-password?token=${token}`, request.url))
-  } catch (error) {
-    return NextResponse.json({ message: error }, { status: 400 })
+    return NextResponse.redirect(
+      new URL(`/update-password?token=${token}`, request.url),
+    )
+  } catch {
+    return NextResponse.json(
+      { message: 'Internal Server Error' },
+      { status: 500 },
+    )
   }
 }

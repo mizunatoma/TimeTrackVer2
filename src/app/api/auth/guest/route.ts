@@ -14,6 +14,9 @@ export const POST = async () => {
 
     return NextResponse.json(null, { status: 200 })
   } catch {
-    return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 })
+    return NextResponse.json(
+      { message: 'Internal Server Error' },
+      { status: 500 },
+    )
   }
 }
