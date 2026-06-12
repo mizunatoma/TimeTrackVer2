@@ -8,7 +8,7 @@ export const authService  = {
   async createPasswordHash(password: string, email:string) {
     const salt = bcrypt.genSaltSync(10)
     const passwordHash = bcrypt.hashSync(password, salt)
-    const newUser = await userRepository.createUser(passwordHash, email)
+    const newUser = await userRepository.create(passwordHash, email)
     return newUser;
   },
   // bcryptjs でパスワードを照合
@@ -23,9 +23,19 @@ export const authService  = {
     cookieStore.set('jwt', jwt, { ...JWT_COOKIE_OPTIONS })
     return jwt
   },
+  // Cookie のJWTトークンを削除
+  async deleteToken() {
+    const cookieStore = await cookies()
+    cookieStore.delete('jwt')
+  },
   // 現在のユーザ情報を Controller へ
   async findUser(email: string) {
     const currentUser = await userRepository.findByEmail(email)
     return currentUser
-  }
+  },
+  // ゲストログイン情報を Controller へ
+  async findGuestUser() {
+    const currentUser = await userRepository.guest()
+    return currentUser
+  },
 }
