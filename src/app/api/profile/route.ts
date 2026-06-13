@@ -1,28 +1,19 @@
 // /api/profile
 import { getAuthUser } from '@/app/_utils/getAuthUser'
-import { prisma } from '@/app/_utils/prisma'
-import type { ProfileResponse, UpdateProfileRequest } from '@/types/api'
+import { profileService } from '@/services/profile.service'
+import type { ProfileResponse } from '@/types/api'
 import { NextRequest, NextResponse } from 'next/server'
 
-// ===============================
-// GET
-// ===============================
 export const GET = async () => {
   try {
     const auth = await getAuthUser()
     if (auth instanceof NextResponse) return auth
     const user = auth.user
 
-    const profile = await prisma.profile.findUnique({
-      where: { userId: user.id },
-      select: {
-        id: true,
-        displayName: true,
-      },
-    })
-    if (!profile)
-      return NextResponse.json({ error: 'Not found' }, { status: 404 })
-
+    const profile = await profileService.findOne(user.id)
+    if (!profile) {
+      return NextResponse.json({ error: 'Not found' }, { status: 401 })
+    }
     return NextResponse.json<ProfileResponse>({ profile }, { status: 200 })
   } catch (e) {
     console.error('GET /profile error:', e)
@@ -33,55 +24,15 @@ export const GET = async () => {
   }
 }
 
-// ===============================
-// PUT
-// ===============================
-export const PUT = async (request: NextRequest) => {
+export const POST = async (request: NextRequest) => {
   try {
     const auth = await getAuthUser()
     if (auth instanceof NextResponse) return auth
     const user = auth.user
 
-    const body = (await request.json()) as UpdateProfileRequest
-    const { displayName } = body
+    const { displayName } = await request.json()
 
-    const profile = await prisma.profile.update({
-      where: { userId: user.id },
-      data: { displayName },
-      select: {
-        id: true,
-        displayName: true,
-      },
-    })
-
-    return NextResponse.json<ProfileResponse>({ profile }, { status: 200 })
-  } catch (e) {
-    console.error('PUT /profile error:', e)
-    return NextResponse.json(
-      { error: 'Internal Server Error' },
-      { status: 500 },
-    )
-  }
-}
-
-// ===============================
-// POST
-// ===============================
-export const POST = async () => {
-  const auth = await getAuthUser()
-  if (auth instanceof NextResponse) return auth
-  const user = auth.user
-
-  try {
-    const profile = await prisma.profile.upsert({
-      where: { userId: user.id },
-      update: {},
-      create: { userId: user.id },
-      select: {
-        id: true,
-        displayName: true,
-      },
-    })
+    const profile = await profileService.upsertDisplayname(user.id, displayName)
 
     return NextResponse.json<ProfileResponse>({ profile }, { status: 200 })
   } catch (e) {
