@@ -1,21 +1,17 @@
 import { analyticsRepository } from '@/repositories/analytics.repository'
 
 export const analyticsService = {
-  async findDayTimelogs(userId: string, fromDay: Date, toDay: Date) {
-    return await analyticsRepository.findDayTimelogs(userId, fromDay, toDay)
-  },
-  // string → Date型に （+09:00 = JST）
-  async parseDateRange(from: string, to: string) {
+  async getAnalytics(userId: string, from: string, to: string) {
+    // string → Date型に （+09:00 = JST）
     const fromDay = new Date(`${from}T00:00:00.000+09:00`)
     const toDay = new Date(`${to}T23:59:59.999+09:00`)
-    return [fromDay, toDay]
-  },
-  async aggregatePerCategory(
-    // ReturnType<typeof ...> → 「この関数の戻り値の型」
-    // Awaited<...> → 「Promiseを解決した後の型」
-    // =>「findDayTimelogs が返す配列と同じ型」
-    logs: Awaited<ReturnType<typeof analyticsRepository.findDayTimelogs>>,
-  ) {
+
+    const logs = await analyticsRepository.findDayTimeLogs(
+      userId,
+      fromDay,
+      toDay,
+    )
+
     // 集計ロジック
     const totals: Record<
       string, // = log.activityId

@@ -2,11 +2,11 @@ import { prisma } from '@/app/_utils/prisma'
 
 export const analyticsRepository = {
   // TimeLog を Activity → Profile 経由で取得
-  async findDayTimelogs(userId: string, fromDay: Date, toDay: Date) {
-    const timelogs = await prisma.timeLog.findMany({
+  async findDayTimeLogs(userId: string, from: Date, to: Date) {
+    const timeLogs = await prisma.timeLog.findMany({
       where: {
         activity: { profile: { userId } },
-        endAt: { gte: fromDay, lte: toDay },
+        endAt: { gte: from, lte: to },
       },
       include: {
         activity: {
@@ -15,6 +15,6 @@ export const analyticsRepository = {
       },
       orderBy: { startAt: 'asc' },
     })
-    return timelogs
+    return timeLogs
   },
 }

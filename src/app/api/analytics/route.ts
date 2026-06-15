@@ -20,15 +20,15 @@ export const GET = async (request: NextRequest) => {
       return NextResponse.json({ error: 'date is required' }, { status: 400 })
     }
 
-    // 指定した日のログを全取得
-    const [fromDay, toDay] = await analyticsService.parseDateRange(from, to)
-    const logs = await analyticsService.findDayTimelogs(user.id, fromDay, toDay)
-
     // カテゴリごとの集計を取得
-    const byCategory = await analyticsService.aggregatePerCategory(logs)
+    const aggregatePerCategory = await analyticsService.getAnalytics(
+      user.id,
+      from,
+      to,
+    )
 
     return NextResponse.json<GetAnalyticsResponse>(
-      { byCategory },
+      { byCategory: aggregatePerCategory },
       { status: 200 },
     )
   } catch (e) {
