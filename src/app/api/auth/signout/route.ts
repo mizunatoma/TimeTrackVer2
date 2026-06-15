@@ -1,8 +1,15 @@
+import { authService } from '@/services/auth.service'
 import { NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
 
 export const POST = async () => {
-  const cookieStore = await cookies()
-  cookieStore.delete('jwt')
-  return NextResponse.json({ message: 'ok' })
+  try {
+    await authService.deleteToken()
+
+    return NextResponse.json(null, { status: 200 })
+  } catch {
+    return NextResponse.json(
+      { message: 'Internal Server Error' },
+      { status: 500 },
+    )
+  }
 }

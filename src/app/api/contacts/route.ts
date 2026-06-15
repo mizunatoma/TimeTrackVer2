@@ -1,11 +1,8 @@
 // /api/contacts
-import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/app/_utils/prisma'
+import { contactsService } from '@/services/contacts.service'
 import type { ContactBody } from '@/types/api'
+import { NextRequest, NextResponse } from 'next/server'
 
-// ===============================
-// POST
-// ===============================
 export const POST = async (request: NextRequest) => {
   try {
     const body = (await request.json()) as ContactBody
@@ -18,9 +15,7 @@ export const POST = async (request: NextRequest) => {
       )
     }
 
-    const contact = await prisma.contacts.create({
-      data: { name, email, message },
-    })
+    const contact = await contactsService.createContact(name, email, message)
 
     return NextResponse.json({ contact }, { status: 200 })
   } catch (e) {

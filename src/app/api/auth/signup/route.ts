@@ -1,22 +1,29 @@
-import { prisma } from '@/app/_utils/prisma'
-import bcrypt from 'bcryptjs'
+import { authService } from '@/services/auth.service'
 import { NextRequest, NextResponse } from 'next/server'
 
 export const POST = async (request: NextRequest) => {
-  try{
-  const { email, password } = await request.json()
+  try {
+    const { email, password } = await request.json()
+    if (!email || !password) {
+      return NextResponse.json(
+        { message: 'password or email address is missing' },
+        { status: 400 },
+      )
+    }
 
-  // bcryptjs でパスワードをハッシュ化
-  const salt = bcrypt.genSaltSync(10)
-  const passwordHash = bcrypt.hashSync(password, salt)
+    // パスワードをハッシュ化
+    const passwordHash = await authService.createPasswordHash(password)
+    // ユーザを新規作成
+    const newUser = await authService.createUser(passwordHash, email)
 
-  // Prisma でDBにユーザーを保存
-  await prisma.user.create({
-    data: { passwordHash, email },
-  })
+    // passwordHash をレスポンスから除外
+    const { passwordHash: _, ...safeUser } = newUser
 
-  return NextResponse.json({ message: 'ok' })
-  } catch (error) {
-    return NextResponse.json({ message: error }, { status: 400 })
+    return NextResponse.json({ user: safeUser }, { status: 201 })
+  } catch {
+    return NextResponse.json(
+      { message: 'Internal Server Error' },
+      { status: 500 },
+    )
   }
 }

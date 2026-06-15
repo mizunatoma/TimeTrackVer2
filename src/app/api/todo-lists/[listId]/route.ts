@@ -1,12 +1,9 @@
 // /api/todo-lists/[listId]
-import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/app/_utils/prisma'
 import { getAuthUser } from '@/app/_utils/getAuthUser'
-import type { UpdateTodoListResponse, UpdateTodoListRequest } from '@/types/api'
+import { todoListService } from '@/services/todo.service'
+import type { UpdateTodoListRequest, UpdateTodoListResponse } from '@/types/api'
+import { NextRequest, NextResponse } from 'next/server'
 
-// ===============================
-// PUT
-// ===============================
 export const PUT = async (
   request: NextRequest,
   { params }: { params: { listId: string } },
@@ -16,36 +13,22 @@ export const PUT = async (
     if (auth instanceof NextResponse) return auth
     const user = auth.user
 
-    const todoList = await prisma.todoList.findFirst({
-      where: {
-        id: params.listId,
-        profile: { userId: user.id },
-      },
-    })
+    const todoList = await todoListService.getTodoList(user.id, params.listId)
     if (!todoList)
-      return NextResponse.json({ error: 'No list found' }, { status: 403 })
+      return NextResponse.json({ error: 'No list found' }, { status: 404 })
 
     const { name } = (await request.json()) as UpdateTodoListRequest
-    const updated = await prisma.todoList.update({
-      where: { id: params.listId },
-      data: { name },
-    })
-
-    const mapped = {
-      id: updated.id,
-      profileId: updated.profileId,
-      name: updated.name,
-      sortOrder: updated.sortOrder,
-      createdAt: updated.createdAt.toISOString(),
-      updatedAt: updated.updatedAt.toISOString(),
-    }
+    const updatedList = await todoListService.updateTodoListName(
+      params.listId,
+      name,
+    )
 
     return NextResponse.json<UpdateTodoListResponse>(
-      { todoList: mapped },
+      { todoList: updatedList },
       { status: 200 },
     )
   } catch (e) {
-    console.error('PUT /api/todo-list/[listId]:', e)
+    console.error('PUT /api/todo-lists/[listId]:', e)
     return NextResponse.json(
       { error: 'Internal Server Error' },
       { status: 500 },
@@ -53,11 +36,8 @@ export const PUT = async (
   }
 }
 
-// ===============================
-// DELETE
-// ===============================
 export const DELETE = async (
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: { listId: string } },
 ) => {
   try {
@@ -65,19 +45,11 @@ export const DELETE = async (
     if (auth instanceof NextResponse) return auth
     const user = auth.user
 
-    const todoList = await prisma.todoList.findFirst({
-      where: {
-        id: params.listId,
-        profile: { userId: user.id },
-      },
-    })
+    const todoList = await todoListService.getTodoList(user.id, params.listId)
     if (!todoList)
-      return NextResponse.json({ error: 'No list found' }, { status: 403 })
+      return NextResponse.json({ error: 'No list found' }, { status: 404 })
 
-    await prisma.todoList.update({
-      where: { id: params.listId },
-      data: { deletedAt: new Date() },
-    })
+    await todoListService.deleteTodoList(params.listId)
 
     return new NextResponse(null, { status: 204 }) // Responseのデータなし、リクエスト成功ステータスコード
   } catch (e) {

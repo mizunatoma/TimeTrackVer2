@@ -1,12 +1,9 @@
 // /api/todos/[todoId]
-import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/app/_utils/prisma'
 import { getAuthUser } from '@/app/_utils/getAuthUser'
+import { todoItemService } from '@/services/todo.service'
 import type { UpdateTodoItemRequest, UpdateTodoItemResponse } from '@/types/api'
+import { NextRequest, NextResponse } from 'next/server'
 
-// ===============================
-// PUT
-// ===============================
 export const PUT = async (
   request: NextRequest,
   { params }: { params: { todoId: string } },
@@ -16,39 +13,18 @@ export const PUT = async (
     if (auth instanceof NextResponse) return auth
     const user = auth.user
 
-    const todo = await prisma.todo.findFirst({
-      where: {
-        id: params.todoId,
-        todoList: { profile: { userId: user.id } },
-      },
-    })
+    const todo = await todoItemService.getTodo(params.todoId, user.id)
     if (!todo)
-      return NextResponse.json({ error: 'No list found' }, { status: 403 })
+      return NextResponse.json({ error: 'No todo found' }, { status: 404 })
 
     const { title, isDone } = (await request.json()) as UpdateTodoItemRequest
-    const updated = await prisma.todo.update({
-      where: { id: params.todoId },
-      data: {
-        title,
-        isDone,
-        doneAt: isDone === true ? new Date() : null,
-      },
-    })
-
-    const mapped = {
-      id: updated.id,
-      todoListId: updated.todoListId,
-      title: updated.title,
-      isDone: updated.isDone,
-      doneAt: updated.doneAt ? updated.doneAt.toISOString() : null,
-      createdAt: updated.createdAt.toISOString(),
-      updatedAt: updated.updatedAt.toISOString(),
-    }
-
-    return NextResponse.json<UpdateTodoItemResponse>(
-      { todo: mapped },
-      { status: 200 },
+    const updatedTodo = await todoItemService.updateTodo(
+      params.todoId,
+      title,
+      isDone,
     )
+
+    return NextResponse.json<UpdateTodoItemResponse>({ todo: updatedTodo })
   } catch (e) {
     console.error('PUT /api/todos/[todoId]:', e)
     return NextResponse.json(
@@ -58,11 +34,8 @@ export const PUT = async (
   }
 }
 
-// ===============================
-// DELETE
-// ===============================
 export const DELETE = async (
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: { todoId: string } },
 ) => {
   try {
@@ -70,21 +43,13 @@ export const DELETE = async (
     if (auth instanceof NextResponse) return auth
     const user = auth.user
 
-    const todo = await prisma.todo.findFirst({
-      where: {
-        id: params.todoId,
-        todoList: { profile: { userId: user.id } },
-      },
-    })
+    const todo = await todoItemService.getTodo(params.todoId, user.id)
     if (!todo)
-      return NextResponse.json({ error: 'No list found' }, { status: 403 })
+      return NextResponse.json({ error: 'No todo found' }, { status: 404 })
 
-    await prisma.todo.update({
-      where: { id: params.todoId },
-      data: { deletedAt: new Date() },
-    })
+    await todoItemService.deleteTodo(todo.id)
 
-    return NextResponse.json(null, { status: 200 })
+    return new NextResponse(null, { status: 204 })
   } catch (e) {
     console.error('DELETE /api/todos/[todoId]:', e)
     return NextResponse.json(

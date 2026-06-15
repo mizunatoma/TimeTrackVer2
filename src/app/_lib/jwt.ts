@@ -9,7 +9,7 @@ export async function signJWT(userId: string) {
     .setIssuedAt()
     .setIssuer('urn:example:issuer')
     .setAudience('urn:example:audience')
-    .setExpirationTime('24h')
+    .setExpirationTime('24h') // サーバーが「このトークンがいつ失効するか」を検証する
     .sign(secret)
   return jwt
 }
@@ -32,6 +32,6 @@ export const JWT_COOKIE_OPTIONS = {
   secure: process.env.NODE_ENV === 'production',
   // 別サイトからの不正リクエストを抑制する （CSRF対策）
   sameSite: 'strict' as const,
-  maxAge: 60 * 60 * 24, // 有効期限（秒）
+  maxAge: 60 * 60 * 24, // 有効期限（秒）// ブラウザが「このCookieをいつ消すか」を知る
   path: '/',
 }

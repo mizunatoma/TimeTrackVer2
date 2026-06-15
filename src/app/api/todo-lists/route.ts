@@ -1,6 +1,7 @@
 // /api/todo-lists
 import { getAuthUser } from '@/app/_utils/getAuthUser'
-import { prisma } from '@/app/_utils/prisma'
+import { profileService } from '@/services/profile.service'
+import { todoListService } from '@/services/todo.service'
 import type {
   CreateTodoListRequest,
   CreateTodoListResponse,
@@ -8,33 +9,13 @@ import type {
 } from '@/types/api'
 import { NextRequest, NextResponse } from 'next/server'
 
-// ===============================
-// GET
-// ===============================
 export const GET = async () => {
   try {
     const auth = await getAuthUser()
     if (auth instanceof NextResponse) return auth
     const user = auth.user
 
-    const todosLists = await prisma.todoList.findMany({
-      where: {
-        profile: { userId: user.id },
-        deletedAt: null,
-      },
-      orderBy: {
-        sortOrder: 'asc',
-      },
-    })
-
-    const todoLists = todosLists.map((todoList) => ({
-      id: todoList.id,
-      profileId: todoList.profileId,
-      name: todoList.name,
-      sortOrder: todoList.sortOrder,
-      createdAt: todoList.createdAt.toISOString(),
-      updatedAt: todoList.updatedAt.toISOString(),
-    }))
+    const todoLists = await todoListService.getTodoLists(user.id)
 
     return NextResponse.json<GetTodoListsResponse>(
       { todoLists },
@@ -49,21 +30,13 @@ export const GET = async () => {
   }
 }
 
-// ===============================
-// POST
-// ===============================
 export const POST = async (request: NextRequest) => {
   try {
     const auth = await getAuthUser()
     if (auth instanceof NextResponse) return auth
     const user = auth.user
 
-    const profile = await prisma.profile.findFirst({
-      where: {
-        userId: user.id,
-      },
-    })
-
+    const profile = await profileService.findOne(user.id)
     if (!profile) {
       return NextResponse.json(
         { error: 'Authorization failure' },
@@ -71,28 +44,12 @@ export const POST = async (request: NextRequest) => {
       )
     }
     const { name } = (await request.json()) as CreateTodoListRequest
-
-    const todoList = await prisma.todoList.create({
-      data: {
-        name,
-        profileId: profile.id,
-        sortOrder: 0,
-      },
-    })
-
-    const mapped = {
-      id: todoList.id,
-      profileId: todoList.profileId,
-      name: todoList.name,
-      sortOrder: todoList.sortOrder,
-      createdAt: todoList.createdAt.toISOString(),
-      updatedAt: todoList.updatedAt.toISOString(),
-    }
+    const todos = await todoListService.createTodoList(name, profile.id)
 
     return NextResponse.json<CreateTodoListResponse>(
-      { todoList: mapped },
+      { todoList: todos },
       { status: 201 },
-    ) // 201=成功(新規作成)
+    )
   } catch (e) {
     console.error('POST /api/todo-list error:', e)
     return NextResponse.json(

@@ -1,12 +1,9 @@
 // /api/timeline/categories/[id]
-import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/app/_utils/prisma'
 import { getAuthUser } from '@/app/_utils/getAuthUser'
+import { categoryService } from '@/services/timeline.service'
 import type { CategoryResponse, UpdateCategoryRequest } from '@/types/api'
+import { NextRequest, NextResponse } from 'next/server'
 
-// ===============================
-// PUT
-// ===============================
 export const PUT = async (
   request: NextRequest,
   { params }: { params: { id: string } },
@@ -16,34 +13,24 @@ export const PUT = async (
     if (auth instanceof NextResponse) return auth
     const user = auth.user
 
-    const category = await prisma.activity.findFirst({
-      where: {
-        id: params.id,
-        profile: { userId: user.id },
-        deletedAt: null,
-      },
-    })
+    const category = await categoryService.findCategory(params.id, user.id)
     if (!category) {
       return NextResponse.json({ error: 'Not found' }, { status: 404 })
     }
 
     const { name, colorToken } = (await request.json()) as UpdateCategoryRequest
-    const updated = await prisma.activity.update({
-      where: { id: params.id },
-      data: {
-        ...(name !== undefined && { name }),
-        ...(colorToken !== undefined && { colorToken }),
-      },
-    })
-
-    const mapped = {
-      id: updated.id,
-      name: updated.name,
-      colorToken: updated.colorToken,
+    if (!name) {
+      return NextResponse.json({ error: 'Not found' }, { status: 404 })
     }
 
+    const updated = await categoryService.updateCategories(
+      category.id,
+      name,
+      colorToken ?? null,
+    )
+
     return NextResponse.json<CategoryResponse>(
-      { category: mapped },
+      { category: updated },
       { status: 200 },
     )
   } catch (e) {
@@ -55,11 +42,8 @@ export const PUT = async (
   }
 }
 
-// ===============================
-// DELETE
-// ===============================
 export const DELETE = async (
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: { id: string } },
 ) => {
   try {
@@ -67,32 +51,14 @@ export const DELETE = async (
     if (auth instanceof NextResponse) return auth
     const user = auth.user
 
-    const category = await prisma.activity.findFirst({
-      where: {
-        id: params.id,
-        profile: { userId: user.id },
-        deletedAt: null,
-      },
-    })
+    const category = await categoryService.findCategory(params.id, user.id)
     if (!category) {
       return NextResponse.json({ error: 'Not found' }, { status: 404 })
     }
 
-    const deleted = await prisma.activity.update({
-      where: { id: params.id },
-      data: { deletedAt: new Date() },
-    })
+    await categoryService.deleteCategories(params.id)
 
-    const mapped = {
-      id: deleted.id,
-      name: deleted.name,
-      colorToken: deleted.colorToken,
-    }
-
-    return NextResponse.json<CategoryResponse>(
-      { category: mapped },
-      { status: 200 },
-    )
+    return new NextResponse<CategoryResponse>(null, { status: 200 })
   } catch (e) {
     console.error('DELETE /category/[id] error:', e)
     return NextResponse.json(

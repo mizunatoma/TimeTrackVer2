@@ -1,33 +1,20 @@
 // /api/timeline/categories
-import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/app/_utils/prisma'
 import { getAuthUser } from '@/app/_utils/getAuthUser'
+import { categoryService } from '@/services/timeline.service'
 import type {
   CategoriesResponse,
-  CreateCategoryResponse,
   CreateCategoryRequest,
+  CreateCategoryResponse,
 } from '@/types/api'
+import { NextRequest, NextResponse } from 'next/server'
 
-// ===============================
-// GET
-// ===============================
 export const GET = async () => {
   try {
     const auth = await getAuthUser()
     if (auth instanceof NextResponse) return auth
     const user = auth.user
 
-    const categories = await prisma.activity.findMany({
-      where: {
-        profile: { userId: user.id },
-        deletedAt: null,
-      },
-      select: {
-        id: true,
-        name: true,
-        colorToken: true,
-      },
-    })
+    const categories = await categoryService.findCategories(user.id)
 
     return NextResponse.json<CategoriesResponse>(
       { categories },
@@ -41,10 +28,6 @@ export const GET = async () => {
     )
   }
 }
-
-// ===============================
-// POST
-// ===============================
 export const POST = async (request: NextRequest) => {
   try {
     const auth = await getAuthUser()
@@ -56,13 +39,7 @@ export const POST = async (request: NextRequest) => {
       return NextResponse.json({ error: 'name is required' }, { status: 400 })
     }
 
-    const data = await prisma.activity.create({
-      data: {
-        name,
-        colorToken,
-        profile: { connect: { userId: user.id } },
-      },
-    })
+    const data = await categoryService.createCategory(user.id, name, colorToken)
 
     return NextResponse.json<CreateCategoryResponse>(
       { id: data.id },
