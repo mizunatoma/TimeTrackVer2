@@ -17,6 +17,41 @@ export const timelineRepository = {
     })
     return timelogs
   },
+
+  async findActivity(activityId: string, userId: string) {
+    const activity = await prisma.activity.findFirst({
+      where: {
+        id: activityId,
+        profile: { userId },
+      },
+    })
+    return activity
+  },
+  async findRunningTimelog(userId: string) {
+    const runningLog = await prisma.timeLog.findFirst({
+      where: {
+        endAt: null,
+        activity: { profile: { userId }, deletedAt: null },
+      },
+      include: { activity: true },
+    })
+    return runningLog
+  },
+  async createTimeLog(activityId: string) {
+    const timeLog = await prisma.timeLog.create({
+      data: { activityId, startAt: new Date() },
+      include: { activity: true },
+    })
+    return timeLog
+  },
+  async endTimeLog(runningLogId: string) {
+    const timelog = await prisma.timeLog.update({
+      where: { id: runningLogId },
+      data: { endAt: new Date() },
+      include: { activity: true },
+    })
+    return timelog
+  },
 }
 
 export const categoryRepository = {
