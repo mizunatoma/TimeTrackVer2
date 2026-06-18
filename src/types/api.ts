@@ -13,7 +13,6 @@ export type ProfileDTO = {
 
 // GET,PUT, POST /api/profile
 export type ProfileResponse = { profile: ProfileDTO }
-// PUT /api/profile
 
 //===Timelog=============================================
 export type TimelogDTO = {
@@ -29,11 +28,9 @@ export type TimelogDTO = {
 // GET /api/timeline
 export type GetTimelogResponse = { activities: TimelogDTO[] }
 // POST /api/timeline/start
-
 export type StartTimelogResponse = { timelog: TimelogDTO }
 // POST /api/timeline/end
 export type EndTimelogResponse = { timelog: TimelogDTO }
-
 // GET /api/timeline/running
 export type GetRunningTimelogResponse =
   | { running: false }
@@ -75,10 +72,8 @@ export type TodoListDTO = {
 // GET /api/todo-lists
 export type GetTodoListsResponse = { todoLists: TodoListDTO[] }
 // POST/api/todo-lists
-
 export type CreateTodoListResponse = { todoList: TodoListDTO }
 // PUT /api/todo-lists/[listId] （フロント未実装）
-
 export type UpdateTodoListResponse = { todoList: TodoListDTO }
 
 //===TodoItem=============================================
@@ -95,7 +90,6 @@ export type TodoItemDTO = {
 // GET /api/todo-lists/[listId]/todos
 export type GetTodoItemsResponse = { todos: TodoItemDTO[] }
 // POST /api/todo-lists/[listId]/todos
-
 export type CreateTodoItemResponse = { todo: TodoItemDTO }
 // PUT /api/todos/[todoId]
 export type UpdateTodoItemResponse = { todo: TodoItemDTO }
