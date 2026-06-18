@@ -1,6 +1,6 @@
 // /api/todo-lists
 import { getAuthUser } from '@/app/_utils/getAuthUser'
-import { nameSchema } from '@/schemas/category'
+import { createTodoListSchema } from '@/schemas/todo'
 import { profileService } from '@/services/profile.service'
 import { todoListService } from '@/services/todo.service'
 import type { CreateTodoListResponse, GetTodoListsResponse } from '@/types/api'
@@ -41,7 +41,7 @@ export const POST = async (request: NextRequest) => {
       )
     }
     const body = await request.json()
-    const result = nameSchema.safeParse(body)
+    const result = createTodoListSchema.safeParse(body)
     if (!result.success) {
       return NextResponse.json({ errors: result.error.issues }, { status: 400 })
     }

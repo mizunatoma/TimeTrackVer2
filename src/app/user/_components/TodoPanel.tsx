@@ -3,10 +3,9 @@ import { useFetch } from '@/app/user/_hooks/useFetch'
 import type {
   CreateTodoItemRequest,
   CreateTodoListRequest,
-  GetTodoItemsResponse,
-  GetTodoListsResponse,
   UpdateTodoItemRequest,
-} from '@/types/api'
+} from '@/schemas/todo'
+import type { GetTodoItemsResponse, GetTodoListsResponse } from '@/types/api'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Check, SquarePen, Trash2, X } from 'lucide-react'
 import { useEffect, useState } from 'react'

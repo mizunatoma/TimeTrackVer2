@@ -1,6 +1,6 @@
 // /api/todo-lists/[listId]
 import { getAuthUser } from '@/app/_utils/getAuthUser'
-import { nameSchema } from '@/schemas/category'
+import { createTodoListSchema } from '@/schemas/todo'
 import { todoListService } from '@/services/todo.service'
 import type { UpdateTodoListResponse } from '@/types/api'
 import { NextRequest, NextResponse } from 'next/server'
@@ -19,7 +19,7 @@ export const PUT = async (
       return NextResponse.json({ error: 'No list found' }, { status: 404 })
 
     const body = await request.json()
-    const result = nameSchema.safeParse(body)
+    const result = createTodoListSchema.safeParse(body)
     if (!result.success) {
       return NextResponse.json({ errors: result.error.issues }, { status: 400 })
     }
