@@ -1,4 +1,5 @@
 'use client'
+import { COLOR_OPTIONS } from '@/constants/colors'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
@@ -10,17 +11,6 @@ type Props = {
   onSave: (name: string, color: string) => void
   onCancel: () => void
 }
-
-const COLOR_OPTIONS = [
-  'bg-rose-400/60',
-  'bg-teal-400/60',
-  'bg-indigo-400/60',
-  'bg-amber-400/60',
-  'bg-sky-400/60',
-  'bg-green-400/60',
-  'bg-purple-400/60',
-  'bg-pink-400/60',
-]
 
 // スキーマ定義（型 + バリデーション一元化）
 const CategorySchema = z.object({

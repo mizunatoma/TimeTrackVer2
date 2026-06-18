@@ -1,7 +1,8 @@
 // /api/timeline/categories/[id]
 import { getAuthUser } from '@/app/_utils/getAuthUser'
+import { updateCategorySchema } from '@/schemas/category'
 import { categoryService } from '@/services/timeline.service'
-import type { CategoryResponse, UpdateCategoryRequest } from '@/types/api'
+import type { CategoryResponse } from '@/types/api'
 import { NextRequest, NextResponse } from 'next/server'
 
 export const PUT = async (
@@ -18,15 +19,16 @@ export const PUT = async (
       return NextResponse.json({ error: 'Not found' }, { status: 404 })
     }
 
-    const { name, colorToken } = (await request.json()) as UpdateCategoryRequest
-    if (!name) {
-      return NextResponse.json({ error: 'Not found' }, { status: 404 })
+    const body = await request.json()
+    const result = updateCategorySchema.safeParse(body)
+    if (!result.success) {
+      return NextResponse.json({ errors: result.error.issues }, { status: 400 })
     }
 
     const updated = await categoryService.updateCategories(
       category.id,
-      name,
-      colorToken ?? null,
+      result.data.name,
+      result.data.colorToken ?? null,
     )
 
     return NextResponse.json<CategoryResponse>(

@@ -1,6 +1,7 @@
 // /api/analytics?from=YYYY-MM-DD&to=YYYY-MM-DD
 export const dynamic = 'force-dynamic'
 import { getAuthUser } from '@/app/_utils/getAuthUser'
+import { dateRangeQuerySchema } from '@/schemas/timeline'
 import { analyticsService } from '@/services/analytics.service'
 import { GetAnalyticsResponse } from '@/types/api'
 import { NextRequest, NextResponse } from 'next/server'
@@ -16,15 +17,16 @@ export const GET = async (request: NextRequest) => {
     const searchParams = request.nextUrl.searchParams
     const from = searchParams.get('from')
     const to = searchParams.get('to')
-    if (!from || !to) {
-      return NextResponse.json({ error: 'date is required' }, { status: 400 })
+    const result = dateRangeQuerySchema.safeParse({ from, to })
+    if (!result.success) {
+      return NextResponse.json({ errors: result.error.issues }, { status: 400 })
     }
 
     // カテゴリごとの集計を取得
     const aggregatePerCategory = await analyticsService.getAnalytics(
       user.id,
-      from,
-      to,
+      result.data.from,
+      result.data.to,
     )
 
     return NextResponse.json<GetAnalyticsResponse>(

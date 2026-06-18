@@ -1,9 +1,7 @@
 'use client'
 import { useFetch } from '@/app/user/_hooks/useFetch'
-import type {
-  GetRunningTimelogResponse,
-  StartTimelogRequest,
-} from '@/types/api'
+import type { StartTimelogRequest } from '@/schemas/timeline'
+import type { GetRunningTimelogResponse } from '@/types/api'
 import {
   Dispatch,
   SetStateAction,

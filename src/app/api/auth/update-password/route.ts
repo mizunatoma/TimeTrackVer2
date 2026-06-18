@@ -1,18 +1,25 @@
+import { updatePasswordSchema } from '@/schemas/auth'
 import { authService } from '@/services/auth.service'
 import { NextRequest, NextResponse } from 'next/server'
 
 export const POST = async (request: NextRequest) => {
   try {
-    const { password, resetToken } = await request.json()
+    const body = await request.json()
+    const result = updatePasswordSchema.safeParse(body)
+    if (!result.success) {
+      return NextResponse.json({ errors: result.error.issues }, { status: 400 })
+    }
 
     // ユーザを特定
-    const user = await authService.findResetUser(resetToken)
+    const user = await authService.findResetUser(result.data.resetToken)
     if (!user) {
       return NextResponse.json({ message: 'Not found' }, { status: 404 })
     }
 
     // パスワードをハッシュ化
-    const passwordHash = await authService.createPasswordHash(password)
+    const passwordHash = await authService.createPasswordHash(
+      result.data.password,
+    )
     // ハッシュをアップデート
     const updatedUser = await authService.updateUser(passwordHash, user.email)
 

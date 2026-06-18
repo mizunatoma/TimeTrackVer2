@@ -1,11 +1,7 @@
 'use client'
 import { useFetch } from '@/app/user/_hooks/useFetch'
-import type {
-  CategoriesResponse,
-  CategoryDTO,
-  CreateCategoryRequest,
-  UpdateCategoryRequest,
-} from '@/types/api'
+import type { CreateCategoryRequest } from '@/schemas/category'
+import type { CategoriesResponse, CategoryDTO } from '@/types/api'
 import { SquarePen, Trash2 } from 'lucide-react'
 import { Dispatch, SetStateAction, useState } from 'react'
 import CategoryModal from './CategoryModal'
@@ -56,7 +52,7 @@ export default function CategoriesListWidget({ onSelectCategory }: Props) {
           body: JSON.stringify({
             name,
             colorToken: color,
-          } as UpdateCategoryRequest),
+          }),
         },
       )
       if (!res.ok) {

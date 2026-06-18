@@ -1,11 +1,8 @@
 // /api/todo-lists/[listId]/todos
 import { getAuthUser } from '@/app/_utils/getAuthUser'
+import { createTodoItemSchema } from '@/schemas/todo'
 import { todoItemService, todoListService } from '@/services/todo.service'
-import type {
-  CreateTodoItemRequest,
-  CreateTodoItemResponse,
-  GetTodoItemsResponse,
-} from '@/types/api'
+import type { CreateTodoItemResponse, GetTodoItemsResponse } from '@/types/api'
 import { NextRequest, NextResponse } from 'next/server'
 
 export const GET = async (
@@ -45,9 +42,15 @@ export const POST = async (
     if (!list)
       return NextResponse.json({ error: 'No list found' }, { status: 404 })
 
-    const { title } = (await request.json()) as CreateTodoItemRequest
-
-    const newTodo = await todoItemService.createTodo(params.listId, title)
+    const body = await request.json()
+    const result = createTodoItemSchema.safeParse(body)
+    if (!result.success) {
+      return NextResponse.json({ errors: result.error.issues }, { status: 400 })
+    }
+    const newTodo = await todoItemService.createTodo(
+      params.listId,
+      result.data.title,
+    )
 
     return NextResponse.json<CreateTodoItemResponse>(
       { todo: newTodo },

@@ -1,5 +1,6 @@
 // /api/profile
 import { getAuthUser } from '@/app/_utils/getAuthUser'
+import { profileSchema } from '@/schemas/profile'
 import { profileService } from '@/services/profile.service'
 import type { ProfileResponse } from '@/types/api'
 import { NextRequest, NextResponse } from 'next/server'
@@ -30,9 +31,16 @@ export const POST = async (request: NextRequest) => {
     if (auth instanceof NextResponse) return auth
     const user = auth.user
 
-    const { displayName } = await request.json()
+    const body = await request.json()
+    const result = profileSchema.safeParse(body)
+    if (!result.success) {
+      return NextResponse.json({ errors: result.error.issues }, { status: 400 })
+    }
 
-    const profile = await profileService.upsertDisplayname(user.id, displayName)
+    const profile = await profileService.upsertDisplayname(
+      user.id,
+      result.data.displayName,
+    )
 
     return NextResponse.json<ProfileResponse>({ profile }, { status: 200 })
   } catch (e) {
