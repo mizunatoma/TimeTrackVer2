@@ -1,7 +1,8 @@
 // /api/todos/[todoId]
 import { getAuthUser } from '@/app/_utils/getAuthUser'
+import { updateTodoItemSchema } from '@/schemas/todo'
 import { todoItemService } from '@/services/todo.service'
-import type { UpdateTodoItemRequest, UpdateTodoItemResponse } from '@/types/api'
+import type { UpdateTodoItemResponse } from '@/types/api'
 import { NextRequest, NextResponse } from 'next/server'
 
 export const PUT = async (
@@ -17,11 +18,15 @@ export const PUT = async (
     if (!todo)
       return NextResponse.json({ error: 'No todo found' }, { status: 404 })
 
-    const { title, isDone } = (await request.json()) as UpdateTodoItemRequest
+    const body = await request.json()
+    const result = updateTodoItemSchema.safeParse(body)
+    if (!result.success) {
+      return NextResponse.json({ errors: result.error.issues }, { status: 400 })
+    }
     const updatedTodo = await todoItemService.updateTodo(
       params.todoId,
-      title,
-      isDone,
+      result.data.title,
+      result.data.isDone,
     )
 
     return NextResponse.json<UpdateTodoItemResponse>({ todo: updatedTodo })

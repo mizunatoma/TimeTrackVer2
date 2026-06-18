@@ -1,11 +1,16 @@
+import { signinSchema } from '@/schemas/auth'
 import { authService } from '@/services/auth.service'
 import { NextRequest, NextResponse } from 'next/server'
 
 export const POST = async (request: NextRequest) => {
   try {
-    const { email, password } = await request.json()
+    const body = await request.json()
+    const result = signinSchema.safeParse(body)
+    if (!result.success) {
+      return NextResponse.json({ errors: result.error.issues }, { status: 400 })
+    }
     // 1. email でユーザーを検索
-    const user = await authService.findUser(email)
+    const user = await authService.findUser(result.data.email)
     if (!user) {
       // enumeration attack（アカウント存在確認攻撃）
       // 対策「メールが存在しないときもパスワード不一致のときも、同じ 401 を返す」
@@ -13,7 +18,7 @@ export const POST = async (request: NextRequest) => {
     }
     // 2. パスワードを照合
     const isMatch = await authService.verifyPassword(
-      password,
+      result.data.password,
       user.passwordHash,
     )
 

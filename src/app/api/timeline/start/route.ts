@@ -1,7 +1,8 @@
 // /api/timeline/start
 import { getAuthUser } from '@/app/_utils/getAuthUser'
+import { startTimelogSchema } from '@/schemas/timeline'
 import { timelineService } from '@/services/timeline.service'
-import type { StartTimelogRequest, StartTimelogResponse } from '@/types/api'
+import type { StartTimelogResponse } from '@/types/api'
 import { NextRequest, NextResponse } from 'next/server'
 
 export const POST = async (request: NextRequest) => {
@@ -16,9 +17,18 @@ export const POST = async (request: NextRequest) => {
       return NextResponse.json({ error: 'Already running' }, { status: 409 })
     }
 
+    const body = await request.json()
+    const result = startTimelogSchema.safeParse(body)
+    if (!result.success) {
+      return NextResponse.json({ errors: result.error.issues }, { status: 400 })
+    }
+
     // 指定されたactivityがユーザのものか確認する
-    const { activityId } = (await request.json()) as StartTimelogRequest
-    const activity = await timelineService.findActivity(activityId, user.id)
+    const activity = await timelineService.findActivity(
+      result.data.activityId,
+      user.id,
+    )
+
     if (!activity) {
       return NextResponse.json(
         { error: 'Authorization failure' },
@@ -27,7 +37,7 @@ export const POST = async (request: NextRequest) => {
     }
 
     // timeLogを開始する
-    const timelog = await timelineService.startTimelog(activityId)
+    const timelog = await timelineService.startTimelog(result.data.activityId)
 
     return NextResponse.json<StartTimelogResponse>({ timelog }, { status: 201 })
   } catch (e) {
