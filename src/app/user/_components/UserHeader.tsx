@@ -16,6 +16,7 @@ export default function UserHeader({
 }: UserHeaderProps) {
   const router = useRouter()
   const user = useUserStore((state) => state.user)
+  const clearUser = useUserStore((state) => state.clearUser)
 
   // ４段階のヘッダー幅調整
   const mainWidth = isCollapsed ? 80 : 160
@@ -24,6 +25,7 @@ export default function UserHeader({
 
   const handleLogout = async () => {
     await fetch('/api/auth/signout', { method: 'POST' })
+    clearUser()
     router.replace('/')
   }
 
