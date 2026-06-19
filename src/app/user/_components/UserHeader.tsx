@@ -1,4 +1,5 @@
 'use client'
+import { useUserStore } from '@/store/userStore'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
@@ -14,6 +15,7 @@ export default function UserHeader({
   isTodoPanelOpen,
 }: UserHeaderProps) {
   const router = useRouter()
+  const user = useUserStore((state) => state.user)
 
   // ４段階のヘッダー幅調整
   const mainWidth = isCollapsed ? 80 : 160
@@ -40,6 +42,8 @@ export default function UserHeader({
         </button>
         <span className="text-lg font-bold text-gray-800">One Track</span>
       </div>
+
+      <div>{`こんにちは、${user?.displayName ?? 'ゲスト'}さん`}</div>
 
       {/*右：ユーザアイコン*/}
 

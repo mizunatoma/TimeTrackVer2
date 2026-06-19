@@ -1,5 +1,6 @@
 'use client'
-import { useState } from 'react'
+import { useUserStore } from '@/store/userStore'
+import { useEffect, useState } from 'react'
 import TodoPanel from './_components/TodoPanel'
 import UserHeader from './_components/UserHeader'
 import UserSidebar from './_components/UserSidebar'
@@ -14,6 +15,16 @@ export default function UserLayout({
 
   const [isTodoPanelOpen, setIsTodoPanelOpen] = useState(false)
   const toggleTodoPanel = () => setIsTodoPanelOpen(!isTodoPanelOpen)
+
+  const setUser = useUserStore((state) => state.setUser)
+  useEffect(() => {
+    const fetchUser = async () => {
+      const res = await fetch('/api/profile')
+      const data = await res.json()
+      setUser(data.profile)
+    }
+    fetchUser()
+  }, [])
 
   return (
     <>
