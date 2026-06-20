@@ -30,7 +30,10 @@ export default function CategoriesListWidget({ onSelectCategory }: Props) {
   // categoryの追加
   const handleAddSave = async (name: string, color: string) => {
     try {
-      const result = categorySchema.safeParse({ name, colorToken: color })
+      const result = categorySchema.safeParse({
+        name,
+        colorToken: color || null,
+      })
       if (!result.success) {
         console.error('バリデーション失敗', result.error)
         return
