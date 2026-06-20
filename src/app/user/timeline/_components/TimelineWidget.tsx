@@ -1,5 +1,6 @@
 'use client'
 import { useFetch } from '@/app/user/_hooks/useFetch'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import type { GetTimelogResponse } from '@/types/api'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useEffect, useState } from 'react'
@@ -26,30 +27,35 @@ export default function TimelogWidget({ timelineKey }: Props) {
   }, [timelineKey, mutate])
 
   return (
-    <div className="widget-card flex h-[calc(100vh-140px)] flex-col">
-      <div className="flex justify-center gap-2">
-        <button
-          onClick={() => {
-            const prev = new Date(date)
-            prev.setDate(prev.getDate() - 1)
-            setDate(toJstDateString(prev))
-          }}
-        >
-          <ChevronLeft size={16} />
-        </button>
-        <h2 className="section-title mb-0">{date}</h2>
-        <button
-          onClick={() => {
-            const prev = new Date(date)
-            prev.setDate(prev.getDate() + 1)
-            setDate(toJstDateString(prev))
-          }}
-        >
-          <ChevronRight size={16} />
-        </button>
-      </div>
+    <Card className="flex h-[calc(100vh-140px)] flex-col">
+      <CardHeader>
+        <div className="flex justify-center gap-2">
+          {/* < */}
+          <button
+            onClick={() => {
+              const prev = new Date(date)
+              prev.setDate(prev.getDate() - 1)
+              setDate(toJstDateString(prev))
+            }}
+          >
+            <ChevronLeft size={16} />
+          </button>
+          {/* YYYY-MM-DD */}
+          <CardTitle>{date}</CardTitle>
+          {/* > */}
+          <button
+            onClick={() => {
+              const prev = new Date(date)
+              prev.setDate(prev.getDate() + 1)
+              setDate(toJstDateString(prev))
+            }}
+          >
+            <ChevronRight size={16} />
+          </button>
+        </div>
+      </CardHeader>
 
-      <div className="relative h-[1440px] overflow-y-auto">
+      <CardContent className="relative h-[1440px] overflow-y-auto">
         {/* 左側：時刻表示 */}
         {hours.map((hour) => (
           <div key={hour} className="flex h-[60px] border-b border-gray-100">
@@ -78,7 +84,7 @@ export default function TimelogWidget({ timelineKey }: Props) {
             </div>
           )
         })}
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   )
 }

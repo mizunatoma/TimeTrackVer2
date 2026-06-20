@@ -1,4 +1,13 @@
 'use client'
+import { Button } from '@/components/ui/button'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+
 import { COLOR_OPTIONS } from '@/constants/colors'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
@@ -42,17 +51,19 @@ export default function CategoryModal({
   const selectedColor = watch('color')
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black/50">
-      <form onSubmit={handleSubmit((data) => onSave(data.name, data.color))}>
-        <div className="flex flex-col gap-4 rounded-lg bg-white p-6">
-          <h2 className="text-lg font-bold text-gray-600">{title}</h2>
-
+    <Dialog
+      open={true}
+      onOpenChange={(open) => {
+        if (!open) onCancel()
+      }}
+    >
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>{title}</DialogTitle>
+        </DialogHeader>
+        <form onSubmit={handleSubmit((data) => onSave(data.name, data.color))}>
           <div>
-            <input
-              className="w-full rounded border border-gray-400 p-2"
-              placeholder={placeholder}
-              {...register('name')}
-            />
+            <Input placeholder={placeholder} {...register('name')} />
             {errors.name && (
               <p className="mt-1 text-sm text-red-400">{errors.name.message}</p>
             )}
@@ -75,21 +86,15 @@ export default function CategoryModal({
 
           {/*キャンセル・保存ボタン*/}
           <div className="flex w-full justify-between">
-            <button
-              className="rounded border border-gray-400 px-3"
-              onClick={() => onCancel()}
-            >
+            <Button onClick={() => onCancel()} variant="outline" type="button">
               キャンセル
-            </button>
-            <button
-              className="rounded border bg-red-400 px-3 text-white"
-              type="submit"
-            >
+            </Button>
+            <Button variant="default" type="submit">
               保存
-            </button>
+            </Button>
           </div>
-        </div>
-      </form>
-    </div>
+        </form>
+      </DialogContent>
+    </Dialog>
   )
 }

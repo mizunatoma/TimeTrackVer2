@@ -1,21 +1,22 @@
 'use client'
-import { useState } from 'react'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useFetch } from '@/app/user/_hooks/useFetch'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import type { GetAnalyticsResponse } from '@/types/api'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { useState } from 'react'
+import type { PieLabelRenderProps } from 'recharts'
 import {
-  BarChart,
   Bar,
-  ResponsiveContainer, // 親要素に合わせて自動リサイズするラッパー
-  XAxis,
-  YAxis,
-  Tooltip, // ホバー時に詳細を表示
+  BarChart, // ホバー時に詳細を表示
   CartesianGrid, // 方眼紙のような目盛を表示
   Cell, // 各バーに個別のスタイルを当てるためのコンポーネント
   Pie,
   PieChart,
+  ResponsiveContainer,
+  Tooltip, // 親要素に合わせて自動リサイズするラッパー
+  XAxis,
+  YAxis,
 } from 'recharts'
-import type { PieLabelRenderProps } from 'recharts'
 import Skelton from '../_components/Skelton'
 
 // 日本時刻のYYYY-MM-DDを返す
@@ -116,20 +117,22 @@ export default function Page() {
 
   return (
     <div className="flex flex-col gap-4 p-4">
-      <div className="widget-card flex flex-col gap-4">
-        {/* ナビゲーション < YYYY-MM > */}
-        <div className="flex items-center justify-center gap-2">
-          <button onClick={() => handleNavButton(-1)}>
-            <ChevronLeft />
-          </button>
-          <h2 className="section-title mb-0">
-            {currentDate.getFullYear()}年 {currentDate.getMonth() + 1}月
-          </h2>
-          <button onClick={() => handleNavButton(1)}>
-            <ChevronRight />
-          </button>
-        </div>
-      </div>
+      {/* ナビゲーション < YYYY-MM > */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-center gap-2">
+            <button onClick={() => handleNavButton(-1)}>
+              <ChevronLeft />
+            </button>
+            <CardTitle>
+              {currentDate.getFullYear()}年 {currentDate.getMonth() + 1}月
+            </CardTitle>
+            <button onClick={() => handleNavButton(1)}>
+              <ChevronRight />
+            </button>
+          </div>
+        </CardHeader>
+      </Card>
 
       {isLoading ? (
         // スケルトンスクリーン シマーエフェクト
@@ -138,74 +141,78 @@ export default function Page() {
           <Skelton height="h-[350px]" />
         </Skelton>
       ) : data?.byCategory.length === 0 ? (
-        <div className="widget-card flex h-[764px] flex-col justify-center gap-4">
-          <p className="flex justify-center">この月の記録はありません</p>
-        </div>
+        <Card className="flex h-[764px] flex-col justify-center gap-4">
+          <CardContent>
+            <p className="flex justify-center">この月の記録はありません</p>
+          </CardContent>
+        </Card>
       ) : (
-        <div className="widget-card flex flex-col gap-4">
-          <div className="flex w-full items-center justify-center gap-4">
-            <p>総時間 : {formatMinutes(sumTotalMinutes)}</p>
-            <p>平均時間 : {formatMinutes(avgMinutes)} / 日</p>
-          </div>
+        <Card>
+          <CardContent>
+            <div className="flex w-full items-center justify-center gap-4">
+              <p>総時間 : {formatMinutes(sumTotalMinutes)}</p>
+              <p>平均時間 : {formatMinutes(avgMinutes)} / 日</p>
+            </div>
 
-          {/*rechartsの棒グラフ*/}
-          <div className="widget-card border">
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={chartData}>
-                <Bar dataKey="totalMinutes">
-                  {chartData.map((item) => (
-                    <Cell
-                      key={item.id}
-                      fill={
-                        item.colorToken
-                          ? COLOR_MAP[item.colorToken] + '99'
-                          : '#5D866C99'
-                      }
-                    />
-                  ))}
-                </Bar>
-                <XAxis dataKey="name" />
-                <YAxis tickFormatter={formatMinutes} ticks={yAxisTicks} />
-                <Tooltip
-                  formatter={(value) => [
-                    typeof value === 'number' ? formatMinutes(value) : value, // typeofで型チェック
-                    '合計時間',
-                  ]}
-                />
-                <CartesianGrid />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
+            {/*rechartsの棒グラフ*/}
+            <div className="pt-2">
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={chartData}>
+                  <Bar dataKey="totalMinutes">
+                    {chartData.map((item) => (
+                      <Cell
+                        key={item.id}
+                        fill={
+                          item.colorToken
+                            ? COLOR_MAP[item.colorToken] + '99'
+                            : '#5D866C99'
+                        }
+                      />
+                    ))}
+                  </Bar>
+                  <XAxis dataKey="name" />
+                  <YAxis tickFormatter={formatMinutes} ticks={yAxisTicks} />
+                  <Tooltip
+                    formatter={(value) => [
+                      typeof value === 'number' ? formatMinutes(value) : value, // typeofで型チェック
+                      '合計時間',
+                    ]}
+                  />
+                  <CartesianGrid />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
 
-          {/*rechartsの円グラフ*/}
-          <div className="widget-card border">
-            <ResponsiveContainer width="100%" height={300}>
-              <PieChart width={500} height={500}>
-                <Pie
-                  dataKey="totalMinutes"
-                  data={chartData}
-                  label={({ name, value }) => {
-                    return `${name} ${formatMinutes(value)}`
-                  }}
-                  labelLine={customizedLabel}
-                  startAngle={450} // 12時の軸を基準に
-                  endAngle={90}
-                >
-                  {chartData.map((item) => (
-                    <Cell
-                      key={item.id}
-                      fill={
-                        item.colorToken
-                          ? COLOR_MAP[item.colorToken] + '99'
-                          : '#5D866C99'
-                      }
-                    />
-                  ))}
-                </Pie>
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
+            {/*rechartsの円グラフ*/}
+            <div className="pt-2">
+              <ResponsiveContainer width="100%" height={300}>
+                <PieChart width={500} height={500}>
+                  <Pie
+                    dataKey="totalMinutes"
+                    data={chartData}
+                    label={({ name, value }) => {
+                      return `${name} ${formatMinutes(value)}`
+                    }}
+                    labelLine={customizedLabel}
+                    startAngle={450} // 12時の軸を基準に
+                    endAngle={90}
+                  >
+                    {chartData.map((item) => (
+                      <Cell
+                        key={item.id}
+                        fill={
+                          item.colorToken
+                            ? COLOR_MAP[item.colorToken] + '99'
+                            : '#5D866C99'
+                        }
+                      />
+                    ))}
+                  </Pie>
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
       )}
     </div>
   )

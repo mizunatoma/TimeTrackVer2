@@ -1,5 +1,13 @@
 'use client'
 import { useFetch } from '@/app/user/_hooks/useFetch'
+import { Button } from '@/components/ui/button'
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
 import type { CreateCategoryRequest } from '@/schemas/category'
 import type { CategoriesResponse, CategoryDTO } from '@/types/api'
 import { SquarePen, Trash2 } from 'lucide-react'
@@ -84,94 +92,99 @@ export default function CategoriesListWidget({ onSelectCategory }: Props) {
   }
 
   return (
-    <div className="widget-card">
+    <Card>
       {/* ヘッダー部分 */}
-      <div className="mb-4 flex items-center justify-between">
-        <h2 className="section-title">Categories</h2>
-        <div className="flex gap-2">
-          <button
-            className="button bg-red-100 text-red-800 hover:bg-red-200"
+      <CardHeader>
+        <CardTitle>Categories</CardTitle>
+        <CardAction>
+          <Button
+            size="sm"
+            className="rounded-full bg-red-100 text-red-800 hover:bg-red-200"
             onClick={() => setIsOpen(true)}
           >
             追加
-          </button>
-        </div>
-      </div>
+          </Button>
+        </CardAction>
+      </CardHeader>
 
-      {!isLoading ? (
-        <div className="grid grid-cols-2 gap-2 md:grid-cols-2">
-          {data?.categories?.map((category) => (
-            <div
-              className="flex h-16 cursor-pointer items-center gap-3 rounded-xl border border-gray-100 bg-white p-4 shadow-sm transition-shadow hover:shadow-md"
-              key={category.id}
-              onClick={() =>
-                onSelectCategory((s) => ({
-                  id: category.id,
-                  count: s.count + 1,
-                }))
-              }
-            >
-              {' '}
-              {/* 兄弟のCurrentCategoryWidgetへ渡す */}
-              <div className="flex w-full justify-between p-4">
-                <div className="flex items-center gap-2">
-                  <div
-                    className={`size-3 shrink-0 rounded-full ${category.colorToken}`}
-                  ></div>
-                  <span className="text">{category.name}</span>
-                </div>
+      <CardContent>
+        {!isLoading ? (
+          <div className="grid grid-cols-2 gap-2 md:grid-cols-2">
+            {data?.categories?.map((category) => (
+              <div
+                className="flex cursor-pointer items-center gap-3 rounded-xl border border-gray-100 bg-white p-3 shadow-sm transition-shadow hover:shadow-md"
+                key={category.id}
+                onClick={() =>
+                  onSelectCategory((s) => ({
+                    id: category.id,
+                    count: s.count + 1,
+                  }))
+                }
+              >
+                {' '}
+                {/* 兄弟のCurrentCategoryWidgetへ渡す */}
+                <div className="flex w-full justify-between">
+                  <div className="flex items-center gap-2">
+                    <div
+                      className={`size-3 shrink-0 rounded-full ${category.colorToken}`}
+                    ></div>
+                    <span className="text-sm font-bold text-gray-600">
+                      {category.name}
+                    </span>
+                  </div>
 
-                <div className="flex gap-4">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation() // 親のonClickを止める
-                      setEditingCategory(category)
-                    }}
-                  >
-                    <SquarePen size={16} />
-                  </button>
-                  <button
-                    className="text-red-400"
-                    onClick={(e) => {
-                      e.stopPropagation() // 親のonClickを止める
-                      handleDelete(category.id)
-                    }}
-                    disabled={isValidating}
-                  >
-                    <Trash2 size={16} />
-                  </button>
+                  <div className="flex gap-4">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation() // 親のonClickを止める
+                        setEditingCategory(category)
+                      }}
+                    >
+                      <SquarePen size={16} />
+                    </button>
+                    <button
+                      className="text-red-400"
+                      onClick={(e) => {
+                        e.stopPropagation() // 親のonClickを止める
+                        handleDelete(category.id)
+                      }}
+                      disabled={isValidating}
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
-      ) : (
-        <p>読み込み中...</p>
-      )}
+            ))}
+          </div>
+        ) : (
+          <p>読み込み中...</p>
+        )}
 
-      {/* category追加モーダル*/}
-      {isOpen && (
-        <CategoryModal
-          title="New Category"
-          placeholder="Category's name"
-          onSave={handleAddSave}
-          onCancel={() => {
-            setIsOpen(false)
-          }}
-        />
-      )}
+        {/* category追加モーダル*/}
+        {isOpen && (
+          <CategoryModal
+            title="New Category"
+            placeholder="Category's name"
+            onSave={handleAddSave}
+            onCancel={() => {
+              setIsOpen(false)
+            }}
+          />
+        )}
 
-      {/* category編集モーダル*/}
-      {editingCategory && (
-        <CategoryModal
-          title="Category"
-          initialName={editingCategory.name}
-          onSave={handleEditSave}
-          onCancel={() => {
-            setEditingCategory(null)
-          }}
-        />
-      )}
-    </div>
+        {/* category編集モーダル*/}
+        {editingCategory && (
+          <CategoryModal
+            title="Category"
+            initialName={editingCategory.name}
+            onSave={handleEditSave}
+            onCancel={() => {
+              setEditingCategory(null)
+            }}
+          />
+        )}
+      </CardContent>
+    </Card>
   )
 }
