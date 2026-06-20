@@ -1,5 +1,7 @@
 'use client'
 import { useFetch } from '@/app/user/_hooks/useFetch'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import type { StartTimelogRequest } from '@/schemas/timeline'
 import type { GetRunningTimelogResponse } from '@/types/api'
 import {
@@ -82,9 +84,12 @@ export default function CurrentCategoryWidget({
   }, [data])
 
   return (
-    <div>
-      <div className="widget-card">
-        <h2 className="section-title">現在のCategory</h2>
+    <Card>
+      <CardHeader>
+        <CardTitle>現在のCategory</CardTitle>
+      </CardHeader>
+
+      <CardContent>
         {!isLoading ? (
           <div>
             <div className="mb-4 flex flex-col gap-3 rounded-xl bg-[#5D866C]/10 p-4">
@@ -102,7 +107,10 @@ export default function CurrentCategoryWidget({
                         開始:{' '}
                         {new Date(data.log.startAt).toLocaleTimeString(
                           'ja-JP',
-                          { hour: '2-digit', minute: '2-digit' },
+                          {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          },
                         )}{' '}
                       </span>
                       <span className="text-xs text-gray-500">
@@ -117,13 +125,14 @@ export default function CurrentCategoryWidget({
 
               {data?.running && (
                 <div className="">
-                  <button
-                    className="button mt-1 w-full bg-rose-200 text-rose-800 hover:bg-rose-300"
+                  <Button
+                    className="mt-1 w-full bg-rose-200 text-rose-800 hover:bg-rose-300"
                     disabled={isValidating}
                     onClick={handleStop}
                   >
+                    {' '}
                     停止
-                  </button>
+                  </Button>
 
                   {/* 今後実装予定
                     < div className="relative mt-4 ">
@@ -140,7 +149,7 @@ export default function CurrentCategoryWidget({
         ) : (
           <p>読み込み中…</p>
         )}
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   )
 }

@@ -11,7 +11,7 @@ export default function Page() {
 
   return (
     <div className="flex flex-col gap-6 p-5">
-      <div className="grid gap-6 md:grid-cols-2">
+      <div className="grid gap-6 md:grid-cols-[3fr_2fr]">
         <TimelineWidget timelineKey={timelineKey} />
         <div className="flex flex-col gap-6">
           <CurrentCategoryWidget
