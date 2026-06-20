@@ -1,9 +1,9 @@
 'use client'
 import { useFetch } from '@/app/user/_hooks/useFetch'
-import type {
-  CreateTodoItemRequest,
-  CreateTodoListRequest,
-  UpdateTodoItemRequest,
+import {
+  createTodoItemSchema,
+  createTodoListSchema,
+  updateTodoItemSchema,
 } from '@/schemas/todo'
 import type { GetTodoItemsResponse, GetTodoListsResponse } from '@/types/api'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -66,11 +66,18 @@ export default function TodoPanel({
   // listの追加
   const handleAddList = async (name: string) => {
     try {
+      const result = createTodoListSchema.safeParse({ name })
+      if (!result.success) {
+        console.error('バリデーション失敗', result.error)
+        return
+      }
+
       const res = await fetch(`/api/todo-lists`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name } as CreateTodoListRequest),
+        body: JSON.stringify(result.data),
       })
+
       if (!res.ok) {
         console.error('リスト追加失敗', await res.json())
         return
@@ -102,11 +109,18 @@ export default function TodoPanel({
   // todoの追加
   const handleAddTodo = async (title: string) => {
     try {
+      const result = createTodoItemSchema.safeParse({ title })
+      if (!result.success) {
+        console.error('バリデーション失敗', result.error)
+        return
+      }
+
       const res = await fetch(`/api/todo-lists/${selectedListId}/todos`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title } as CreateTodoItemRequest), // ※型アサーションのため、実行時チェックはない
+        body: JSON.stringify(result.data),
       })
+
       if (!res.ok) {
         console.error('todo追加失敗', await res.json())
         return
@@ -124,11 +138,18 @@ export default function TodoPanel({
     isDone: boolean,
   ) => {
     try {
+      const result = updateTodoItemSchema.safeParse({ title, isDone })
+      if (!result.success) {
+        console.error('バリデーション失敗', result.error)
+        return
+      }
+
       const res = await fetch(`/api/todos/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title, isDone } as UpdateTodoItemRequest),
+        body: JSON.stringify(result.data),
       })
+
       if (!res.ok) {
         console.error('todo編集失敗', await res.json())
         return

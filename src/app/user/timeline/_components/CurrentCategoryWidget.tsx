@@ -2,7 +2,7 @@
 import { useFetch } from '@/app/user/_hooks/useFetch'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import type { StartTimelogRequest } from '@/schemas/timeline'
+import { startTimelogSchema } from '@/schemas/timeline'
 import type { GetRunningTimelogResponse } from '@/types/api'
 import {
   Dispatch,
@@ -29,13 +29,20 @@ export default function CurrentCategoryWidget({
   const start = useCallback(async () => {
     // useCallback: 関数をメモ化して無限ループを防ぐ
     try {
+      const result = startTimelogSchema.safeParse({
+        activityId: currentCategoryID.id,
+      })
+      if (!result.success) {
+        console.error('バリデーション失敗', result.error)
+        return
+      }
+
       const res = await fetch('/api/timeline/start', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          activityId: currentCategoryID.id,
-        } as StartTimelogRequest),
+        body: JSON.stringify(result.data),
       })
+
       if (!res.ok) {
         console.error('タイムトラックの開始失敗', await res.json())
         return

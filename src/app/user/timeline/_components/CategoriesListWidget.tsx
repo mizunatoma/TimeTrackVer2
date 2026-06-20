@@ -8,7 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import type { CreateCategoryRequest } from '@/schemas/category'
+import { categorySchema } from '@/schemas/category'
 import type { CategoriesResponse, CategoryDTO } from '@/types/api'
 import { SquarePen, Trash2 } from 'lucide-react'
 import { Dispatch, SetStateAction, useState } from 'react'
@@ -30,14 +30,21 @@ export default function CategoriesListWidget({ onSelectCategory }: Props) {
   // categoryの追加
   const handleAddSave = async (name: string, color: string) => {
     try {
+      const result = categorySchema.safeParse({
+        name,
+        colorToken: color || null,
+      })
+      if (!result.success) {
+        console.error('バリデーション失敗', result.error)
+        return
+      }
+
       const res = await fetch('/api/timeline/categories', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name,
-          colorToken: color,
-        } as CreateCategoryRequest),
+        body: JSON.stringify(result.data), // 検証済みデータを送る
       })
+
       if (!res.ok) {
         console.error('category追加失敗', await res.json())
         return
