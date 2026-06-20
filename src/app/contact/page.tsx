@@ -1,11 +1,12 @@
 'use client'
+import { Card } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
 import type { ContactBody } from '@/types/api'
 import Link from 'next/link'
 import { useForm } from 'react-hook-form'
-import { FormButton } from '../_components/form/FormButton'
-import { FormInput } from '../_components/form/FormInput'
-import { FormLabel } from '../_components/form/FormLabel'
-import { FormTextarea } from '../_components/form/FormTextarea'
+import { FormButton } from '../../components/form/FormButton'
 
 export default function ContactPage() {
   const {
@@ -22,7 +23,6 @@ export default function ContactPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
       })
-
       if (res.ok) {
         alert('送信しました')
         reset()
@@ -37,13 +37,15 @@ export default function ContactPage() {
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-[#F2F0E9] px-4">
-      <div className="auth-card w-full max-w-md">
+      <Card className="w-full max-w-md p-8 shadow-lg">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          <h1 className="auth-title">お問い合わせ</h1>
+          <h1 className="mb-8 text-center text-2xl font-bold text-gray-900">
+            お問い合わせ
+          </h1>
           <div>
-            <FormLabel htmlFor="name">お名前</FormLabel>
-            <FormInput
-              loading={isSubmitting}
+            <Label htmlFor="name">お名前</Label>
+            <Input
+              disabled={isSubmitting}
               {...register('name', {
                 required: '名前は必須です',
                 maxLength: {
@@ -57,9 +59,9 @@ export default function ContactPage() {
             )}
           </div>
           <div>
-            <FormLabel htmlFor="email">メールアドレス</FormLabel>
-            <FormInput
-              loading={isSubmitting}
+            <Label htmlFor="email">メールアドレス</Label>
+            <Input
+              disabled={isSubmitting}
               {...register('email', {
                 required: 'メールアドレスは必須です',
                 pattern: {
@@ -75,10 +77,10 @@ export default function ContactPage() {
             )}
           </div>
           <div>
-            <FormLabel htmlFor="text">本文</FormLabel>
-            <FormTextarea
+            <Label htmlFor="text">本文</Label>
+            <Textarea
               rows={5}
-              loading={isSubmitting}
+              disabled={isSubmitting}
               {...register('message', { required: '本文は必須です' })}
             />
             {errors.message && (
@@ -88,11 +90,11 @@ export default function ContactPage() {
             )}
           </div>
           <FormButton type="submit" loading={isSubmitting} label="送信" />
-          <div className="text flex justify-center hover:underline">
+          <div className="flex justify-center text-sm font-bold text-gray-600 hover:underline">
             <Link href="/user/timeline">ダッシュボードに戻る</Link>
           </div>
         </form>
-      </div>
+      </Card>
     </main>
   )
 }
