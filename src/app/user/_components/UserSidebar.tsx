@@ -1,11 +1,18 @@
 'use client'
-import { BarChart2, ClipboardList, LucideIcon, Timer } from 'lucide-react'
+import {
+  BarChart2,
+  ClipboardList,
+  LucideIcon,
+  Settings,
+  Timer,
+} from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
 const MENU_ITEMS = [
   { href: '/user/timeline', icon: Timer, label: 'Timeline' },
   { href: '/user/analytics', icon: BarChart2, label: 'Analytics' },
+  { href: '/user/settings', icon: Settings, label: 'Settings' },
 ]
 
 interface SidebarLinkProps {

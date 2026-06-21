@@ -1,6 +1,13 @@
 import { cn } from '@/lib/utils'
 import * as React from 'react'
 
+// ef は props として渡せないから、コールバックの第2引数という位置で受け取る
+// React.forwardRef(
+//   (props, ref) => {   // 第1引数: 通常のprops / 第2引数: ref
+//     return <input ref={ref} {...props} />
+//   }
+// )
+
 const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<'input'>>(
   ({ className, type, ...props }, ref) => {
     return (
@@ -22,6 +29,9 @@ const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<'input'>>(
     )
   },
 )
+// React DevTools コンポーネントツリーを見たとき、
+// forwardRef でラップしたコンポーネントはForwardRef になり分かりづらいため、
+// デバッグ用の名前タグ ↓
 Input.displayName = 'Input'
 
 export { Input }
