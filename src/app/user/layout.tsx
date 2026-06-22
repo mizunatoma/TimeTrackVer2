@@ -1,6 +1,7 @@
 'use client'
+import { useLocalStorage } from '@/hooks/useLocalStorage'
 import { useUserStore } from '@/store/userStore'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import TodoPanel from './_components/TodoPanel'
 import UserHeader from './_components/UserHeader'
 import UserSidebar from './_components/UserSidebar'
@@ -10,10 +11,13 @@ export default function UserLayout({
 }: {
   children: React.ReactNode
 }) {
-  const [isCollapsed, setIsCollapsed] = useState(false)
+  const [isCollapsed, setIsCollapsed] = useLocalStorage('sideBarToggle', false)
   const toggleSidebar = () => setIsCollapsed(!isCollapsed)
 
-  const [isTodoPanelOpen, setIsTodoPanelOpen] = useState(false)
+  const [isTodoPanelOpen, setIsTodoPanelOpen] = useLocalStorage(
+    'todoPanelToggle',
+    false,
+  )
   const toggleTodoPanel = () => setIsTodoPanelOpen(!isTodoPanelOpen)
 
   const setUser = useUserStore((state) => state.setUser)
