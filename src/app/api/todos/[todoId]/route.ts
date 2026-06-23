@@ -1,5 +1,6 @@
 // /api/todos/[todoId]
 import { getAuthUser } from '@/app/_utils/getAuthUser'
+import { logger } from '@/lib/logger'
 import { updateTodoItemSchema } from '@/schemas/todo'
 import { todoItemService } from '@/services/todo.service'
 import type { UpdateTodoItemResponse } from '@/types/api'
@@ -31,7 +32,9 @@ export const PUT = async (
 
     return NextResponse.json<UpdateTodoItemResponse>({ todo: updatedTodo })
   } catch (e) {
-    console.error('PUT /api/todos/[todoId]:', e)
+    logger.error('PUT /api/todos/[todoId]', {
+      error: e instanceof Error ? e.stack : String(e),
+    })
     return NextResponse.json(
       { error: 'Internal Server Error' },
       { status: 500 },
@@ -56,7 +59,9 @@ export const DELETE = async (
 
     return new NextResponse(null, { status: 204 })
   } catch (e) {
-    console.error('DELETE /api/todos/[todoId]:', e)
+    logger.error('DELETE /api/todos/[todoId]', {
+      error: e instanceof Error ? e.stack : String(e),
+    })
     return NextResponse.json(
       { error: 'Internal Server Error' },
       { status: 500 },

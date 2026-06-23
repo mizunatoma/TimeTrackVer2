@@ -1,4 +1,5 @@
 // /api/contacts
+import { logger } from '@/lib/logger'
 import { contactSchema } from '@/schemas/contact'
 import { contactsService } from '@/services/contacts.service'
 import { NextRequest, NextResponse } from 'next/server'
@@ -19,7 +20,9 @@ export const POST = async (request: NextRequest) => {
 
     return NextResponse.json({ contact }, { status: 200 })
   } catch (e) {
-    console.error('POST /contact error:', e)
+    logger.error('POST /contact error', {
+      error: e instanceof Error ? e.stack : String(e),
+    })
     return NextResponse.json(
       { error: 'Internal Server Error' },
       { status: 500 },

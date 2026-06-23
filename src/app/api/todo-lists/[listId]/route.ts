@@ -1,5 +1,6 @@
 // /api/todo-lists/[listId]
 import { getAuthUser } from '@/app/_utils/getAuthUser'
+import { logger } from '@/lib/logger'
 import { createTodoListSchema } from '@/schemas/todo'
 import { todoListService } from '@/services/todo.service'
 import type { UpdateTodoListResponse } from '@/types/api'
@@ -33,7 +34,9 @@ export const PUT = async (
       { status: 200 },
     )
   } catch (e) {
-    console.error('PUT /api/todo-lists/[listId]:', e)
+    logger.error('PUT /api/todo-lists/[listId]', {
+      error: e instanceof Error ? e.stack : String(e),
+    })
     return NextResponse.json(
       { error: 'Internal Server Error' },
       { status: 500 },
@@ -58,7 +61,9 @@ export const DELETE = async (
 
     return new NextResponse(null, { status: 204 }) // Responseのデータなし、リクエスト成功ステータスコード
   } catch (e) {
-    console.error('DELETE /api/todo-lists/[listId]:', e)
+    logger.error('DELETE /api/todo-lists/[listId]', {
+      error: e instanceof Error ? e.stack : String(e),
+    })
     return NextResponse.json(
       { error: 'Internal Server Error' },
       { status: 500 },
