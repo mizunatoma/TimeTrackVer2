@@ -1,5 +1,6 @@
 // /api/timeline/categories/[id]
 import { getAuthUser } from '@/app/_utils/getAuthUser'
+import { logger } from '@/lib/logger'
 import { updateCategorySchema } from '@/schemas/category'
 import { categoryService } from '@/services/timeline.service'
 import type { CategoryResponse } from '@/types/api'
@@ -36,7 +37,9 @@ export const PUT = async (
       { status: 200 },
     )
   } catch (e) {
-    console.error('PUT /category/[id] error:', e)
+    logger.error('PUT /category/[id] error', {
+      error: e instanceof Error ? e.stack : String(e),
+    })
     return NextResponse.json(
       { error: 'Internal Server Error' },
       { status: 500 },
@@ -62,7 +65,9 @@ export const DELETE = async (
 
     return new NextResponse<CategoryResponse>(null, { status: 200 })
   } catch (e) {
-    console.error('DELETE /category/[id] error:', e)
+    logger.error('DELETE /category/[id] error', {
+      error: e instanceof Error ? e.stack : String(e),
+    })
     return NextResponse.json(
       { error: 'Internal Server Error' },
       { status: 500 },

@@ -1,5 +1,6 @@
 // /api/timeline/start
 import { getAuthUser } from '@/app/_utils/getAuthUser'
+import { logger } from '@/lib/logger'
 import { startTimelogSchema } from '@/schemas/timeline'
 import { timelineService } from '@/services/timeline.service'
 import type { StartTimelogResponse } from '@/types/api'
@@ -41,7 +42,9 @@ export const POST = async (request: NextRequest) => {
 
     return NextResponse.json<StartTimelogResponse>({ timelog }, { status: 201 })
   } catch (e) {
-    console.error('POST /timeline/start error:', e)
+    logger.error('POST /timeline/start error', {
+      error: e instanceof Error ? e.stack : String(e),
+    })
     return NextResponse.json(
       { error: 'Internal Server Error' },
       { status: 500 },

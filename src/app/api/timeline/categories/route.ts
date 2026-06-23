@@ -1,5 +1,6 @@
 // /api/timeline/categories
 import { getAuthUser } from '@/app/_utils/getAuthUser'
+import { logger } from '@/lib/logger'
 import { categorySchema } from '@/schemas/category'
 import { categoryService } from '@/services/timeline.service'
 import type { CategoriesResponse, CreateCategoryResponse } from '@/types/api'
@@ -18,7 +19,9 @@ export const GET = async () => {
       { status: 200 },
     )
   } catch (e) {
-    console.error('GET /activities error:', e)
+    logger.error('GET /activities error', {
+      error: e instanceof Error ? e.stack : String(e),
+    })
     return NextResponse.json(
       { error: 'Internal Server Error' },
       { status: 500 },
@@ -48,7 +51,9 @@ export const POST = async (request: NextRequest) => {
       { status: 201 },
     )
   } catch (e) {
-    console.error('POST /activities error:', e)
+    logger.error('POST /activities error', {
+      error: e instanceof Error ? e.stack : String(e),
+    })
     return NextResponse.json(
       { error: 'Internal Server Error' },
       { status: 500 },

@@ -1,6 +1,7 @@
 // /api/analytics?from=YYYY-MM-DD&to=YYYY-MM-DD
 export const dynamic = 'force-dynamic'
 import { getAuthUser } from '@/app/_utils/getAuthUser'
+import { logger } from '@/lib/logger'
 import { dateRangeQuerySchema } from '@/schemas/timeline'
 import { analyticsService } from '@/services/analytics.service'
 import { GetAnalyticsResponse } from '@/types/api'
@@ -34,7 +35,9 @@ export const GET = async (request: NextRequest) => {
       { status: 200 },
     )
   } catch (e) {
-    console.error('GET /api/analytics?from=YYYY-MM-DD&to=YYYY-MM-DD:', e)
+    logger.error('GET /api/analytics?from=YYYY-MM-DD&to=YYYY-MM-DD', {
+      error: e instanceof Error ? e.stack : String(e),
+    })
     return NextResponse.json(
       { error: 'Internal Server Error' },
       { status: 500 },

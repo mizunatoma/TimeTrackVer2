@@ -1,6 +1,7 @@
 // /api/timeline/running
 export const dynamic = 'force-dynamic'
 import { getAuthUser } from '@/app/_utils/getAuthUser'
+import { logger } from '@/lib/logger'
 import { timelineService } from '@/services/timeline.service'
 import type { GetRunningTimelogResponse } from '@/types/api'
 import { NextResponse } from 'next/server'
@@ -18,7 +19,9 @@ export const GET = async () => {
 
     return NextResponse.json<GetRunningTimelogResponse>(runningLog)
   } catch (e) {
-    console.error('GET /timeline/running error:', e)
+    logger.error('GET /timeline/running error', {
+      error: e instanceof Error ? e.stack : String(e),
+    })
     return NextResponse.json(
       { error: 'Internal Server Error' },
       { status: 500 },

@@ -1,5 +1,6 @@
 // /api/todo-lists
 import { getAuthUser } from '@/app/_utils/getAuthUser'
+import { logger } from '@/lib/logger'
 import { createTodoListSchema } from '@/schemas/todo'
 import { profileService } from '@/services/profile.service'
 import { todoListService } from '@/services/todo.service'
@@ -19,7 +20,9 @@ export const GET = async () => {
       { status: 200 },
     )
   } catch (e) {
-    console.error('GET /api/todo-lists:', e)
+    logger.error('GET /api/todo-lists', {
+      error: e instanceof Error ? e.stack : String(e),
+    })
     return NextResponse.json(
       { error: 'Internal Server Error' },
       { status: 500 },
@@ -56,7 +59,9 @@ export const POST = async (request: NextRequest) => {
       { status: 201 },
     )
   } catch (e) {
-    console.error('POST /api/todo-list error:', e)
+    logger.error('POST /api/todo-list error', {
+      error: e instanceof Error ? e.stack : String(e),
+    })
     return NextResponse.json(
       { error: 'Internal Server Error' },
       { status: 500 },

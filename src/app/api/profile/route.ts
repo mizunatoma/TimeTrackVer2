@@ -1,5 +1,6 @@
 // /api/profile
 import { getAuthUser } from '@/app/_utils/getAuthUser'
+import { logger } from '@/lib/logger'
 import { profileSchema } from '@/schemas/profile'
 import { profileService } from '@/services/profile.service'
 import type { ProfileResponse } from '@/types/api'
@@ -17,7 +18,10 @@ export const GET = async () => {
     }
     return NextResponse.json<ProfileResponse>({ profile }, { status: 200 })
   } catch (e) {
-    console.error('GET /profile error:', e)
+    logger.error('GET /profile error', {
+      error: e instanceof Error ? e.stack : String(e),
+    })
+
     return NextResponse.json(
       { error: 'Internal Server Error' },
       { status: 500 },
@@ -44,7 +48,9 @@ export const POST = async (request: NextRequest) => {
 
     return NextResponse.json<ProfileResponse>({ profile }, { status: 200 })
   } catch (e) {
-    console.error('POST /profile error:', e)
+    logger.error('POST /profile error', {
+      error: e instanceof Error ? e.stack : String(e),
+    })
     return NextResponse.json(
       { error: 'Internal Server Error' },
       { status: 500 },

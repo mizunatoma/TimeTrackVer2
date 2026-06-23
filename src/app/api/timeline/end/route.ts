@@ -1,5 +1,6 @@
 // /api/timeline/end
 import { getAuthUser } from '@/app/_utils/getAuthUser'
+import { logger } from '@/lib/logger'
 import { timelineService } from '@/services/timeline.service'
 import type { EndTimelogResponse } from '@/types/api'
 import { NextResponse } from 'next/server'
@@ -24,7 +25,9 @@ export const POST = async () => {
 
     return NextResponse.json<EndTimelogResponse>({ timelog }, { status: 200 })
   } catch (e) {
-    console.error('POST /timeline/end error:', e)
+    logger.error('POST /timeline/end error', {
+      error: e instanceof Error ? e.stack : String(e),
+    })
     return NextResponse.json(
       { error: 'Internal Server Error' },
       { status: 500 },
