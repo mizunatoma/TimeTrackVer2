@@ -67,6 +67,41 @@ export const timelineService = {
     const log = await timelineRepository.endTimeLog(runningLogId)
     return toTimelogDTO(log)
   },
+  async parsePeriodRange(period: 'day' | 'week' | 'month', page: number) {
+    const today = new Date()
+    const toDateStr = (d: Date): string => {
+      const jst = new Date(d.getTime() + 9 * 60 * 60 * 1000)
+      return jst.toISOString().split('T')[0]
+    }
+    let from: Date
+    let to: Date
+
+    if (period === 'day') {
+      from = new Date(today)
+      from.setDate(today.getDate() + page) // page=-1 → 昨日
+      to = new Date(from) // 1日分なので同じ日
+    } else if (period === 'week') {
+      const dayOfWeek = today.getDay() // 0=日, 1=月, 2=火..
+      const mondayOffset = (dayOfWeek + 6) % 7 // 何日戻ると当週の月曜日か
+      from = new Date(today)
+      from.setDate(today.getDate() - mondayOffset + page * 7)
+      to = new Date(from)
+      to.setDate(from.getDate() + 6) // 月曜+6 = 日曜
+    } else {
+      from = new Date(
+        today.getFullYear(),
+        today.getMonth() + page, // page=-1 → 先月, page=-2 → 先々月..
+        1, // 1日に固定
+      )
+      to = new Date(
+        today.getFullYear(),
+        today.getMonth() + page + 1, // 翌月
+        0, // 翌月0日目 = 前月末日
+      )
+    }
+
+    return this.parseDateRange(toDateStr(from), toDateStr(to)) // 既存メソッドで JST変換
+  },
 }
 
 //-----------------------------------------------------------------
