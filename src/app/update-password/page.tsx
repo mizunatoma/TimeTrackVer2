@@ -3,6 +3,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { Suspense } from 'react'
 import { useForm } from 'react-hook-form'
 import { FormButton } from '../../components/form/FormButton'
 import AuthLayout from '../_components/AuthLayout'
@@ -12,7 +13,7 @@ type Form = {
   confirmPassword: string
 }
 
-export default function Page() {
+function UPdatePasswordForm() {
   const router = useRouter()
   const {
     register,
@@ -79,5 +80,14 @@ export default function Page() {
         </div>
       </form>
     </AuthLayout>
+  )
+}
+
+//  <Suspense> 子要素が読み込みを完了するまでフォールバックを表示させる
+export default function Page() {
+  return (
+    <Suspense>
+      <UPdatePasswordForm />
+    </Suspense>
   )
 }
