@@ -77,11 +77,12 @@ export default function Page() {
             />
           </div>
           <Button
-            asChild
             variant="outline"
+            type="submit"
+            disabled={isSubmitting}
             className="w-full border-[#5A8B7D] text-[#5A8B7D] hover:bg-[#F2F0E9]"
           >
-            <Link href="/signup">新規登録</Link>
+            新規登録
           </Button>
 
           {/*  今後実装予定

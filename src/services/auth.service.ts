@@ -65,7 +65,7 @@ export const authService = {
     const resend = new Resend(process.env.RESEND_API_KEY)
     const resetUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/api/auth/callback?token=${resetToken}`
     const sendMail = await resend.emails.send({
-      from: 'onboarding@resend.dev',
+      from: process.env.EMAIL_FROM!,
       to: user.email,
       subject: 'OneTrack パスワードリセット',
       html: `パスワードリセットはこちら: ${resetUrl}`,
