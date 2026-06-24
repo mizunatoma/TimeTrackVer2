@@ -2,7 +2,7 @@
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { FormButton } from '../../components/form/FormButton'
 import AuthLayout from '../_components/AuthLayout'
@@ -21,6 +21,9 @@ export default function Page() {
     formState: { isSubmitting },
   } = useForm<Form>()
 
+  const searchParams = useSearchParams()
+  const token = searchParams.get('token')
+
   const onSubmit = async (data: Form) => {
     try {
       const { password, confirmPassword } = data
@@ -31,7 +34,7 @@ export default function Page() {
       const res = await fetch('/api/auth/update-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password }),
+        body: JSON.stringify({ password, resetToken: token }),
       })
       if (!res.ok) {
         alert('パスワードの更新に失敗しました')
