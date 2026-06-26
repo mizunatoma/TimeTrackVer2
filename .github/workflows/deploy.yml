@@ -1,0 +1,24 @@
+name: CD
+
+# releaseブランチへのマージ(push)でEC2へ自動デプロイ
+on:
+  push:
+    branches: [release]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: EC2へSSHして最新コードをデプロイ
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.EC2_HOST  }}
+          username: ${{ secrets.EC2_USER  }}
+          key: ${{ secrets.EC2_SSH_KEY  }}
+
+          script: | # ↓接続後にEC2上で実行する手順
+            cd /home/ubuntu/TimeTrackVer2
+            git pull
+            npm ci
+            npm run build
+            pm2 restart onetrack # 常駐プロセスを再起動して反映
