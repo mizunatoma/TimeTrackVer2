@@ -8,6 +8,9 @@ on:
 jobs:
   ci:
     runs-on: ubuntu-latest # GitHub提供のUbuntu VM
+    env:
+      # ダミーURL（generate/buildはDB接続しないため形式のみ据置)
+      DATABASE_URL: 'mysql://user:password@localhost:3306/db'
     steps:
       - uses: actions/checkout@v4 # リポジトリのコードを取得
 
