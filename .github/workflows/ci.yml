@@ -1,0 +1,22 @@
+name: CI
+
+# mainブランチへのPR時にlint・buildを実行するCI
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest # GitHub提供のUbuntu VM
+    steps:
+      - uses: actions/checkout@v4 # リポジトリのコードを取得
+
+      - uses: actions/setup-node@v4 # VMにNodeを用意
+        with:
+          node-version: 22
+          cache: 'npm' # npmキャッシュで2回目以降を高速化
+
+      - run: npm ci # package-lock.json通りに厳密インストール
+      - run: npx prisma generate # Prisma Clientの型生成
+      - run: npm run lint
+      - run: npm run build # 型エラー・SSRエラー等をビルドで検知
