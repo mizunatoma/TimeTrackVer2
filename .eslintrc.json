@@ -8,6 +8,12 @@
   "ignorePatterns": ["*.config.js"],
   "rules": {
     "import/order": "off",
-    "tailwindcss/classnames-order": "off"
+    "tailwindcss/classnames-order": "off",
+    // 未使用変数はErrorのまま。
+    // ただし名前が _ で始まるものは"意図的に未使用"とみなして見逃す
+    "@typescript-eslint/no-unused-vars": [
+      "error",
+      { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_" }
+    ]
   }
 }

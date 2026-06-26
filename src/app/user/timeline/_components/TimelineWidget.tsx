@@ -17,7 +17,7 @@ const toJstDateString = (date: Date): string => {
 
 export default function TimelogWidget({ timelineKey }: Props) {
   const hours = Array.from({ length: 24 }, (_, i) => i) // [0, 1, 2, ... 23]
-  const [period, setPeriod] = useState<'day' | 'week' | 'month'>('day')
+  const [period] = useState<'day' | 'week' | 'month'>('day')
   const [page, setPage] = useState(0)
   const debouncedPage = useDebounce(page, 300)
 
