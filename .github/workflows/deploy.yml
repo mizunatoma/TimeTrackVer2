@@ -1,24 +1,62 @@
 name: CD
-
 # releaseブランチへのマージ(push)でEC2へ自動デプロイ
+
 on:
   push:
     branches: [release]
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest # 司令塔となる使い捨てVM(runner)
     steps:
+      # SGの名簿を書き換えるためのAWS権限(IAM)をセット
+      - name: AWS認証情報を設定
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      # SGがVMのSSHをブロックするので、VMのIPだけ22番に一時許可（門を開ける）
+      - name: runnerのIPをSGの22番に一時許可
+        id: open-sg
+        run: |
+          RUNNER_IP=$(curl -s https://api.ipify.org)   # VM自身の公開IPを取得
+          echo "runner_ip=$RUNNER_IP" >> "$GITHUB_OUTPUT" # 後で閉じるIPをメモ
+          aws ec2 authorize-security-group-ingress \
+            --group-id ${{ secrets.AWS_SG_ID }} \
+            --protocol tcp --port 22 \
+            --cidr "${RUNNER_IP}/32"                    # その1個のIPだけ通す
+
+      # SSH鍵で部屋(EC2)に入り、デプロイ作業はEC2本人が実行
       - name: EC2へSSHして最新コードをデプロイ
         uses: appleboy/ssh-action@v1
         with:
-          host: ${{ secrets.EC2_HOST  }}
-          username: ${{ secrets.EC2_USER  }}
-          key: ${{ secrets.EC2_SSH_KEY  }}
-
-          script: | # ↓接続後にEC2上で実行する手順
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
             cd /home/ubuntu/TimeTrackVer2
             git pull
             npm ci
             npm run build
-            pm2 restart onetrack # 常駐プロセスを再起動して反映
+            pm2 restart onetrack
+
+      # 開けた門は必ず閉める（if always() = 失敗しても実行）開けたIPをピンポイントで削除
+      - name: SGからrunnerのIP許可を削除
+        if: always()
+        run: |
+          aws ec2 revoke-security-group-ingress \
+            --group-id ${{ secrets.AWS_SG_ID }} \
+            --protocol tcp --port 22 \
+            --cidr "${{ steps.open-sg.outputs.runner_ip }}/32"
+
+# VM（配達員）がEC2（部屋）に荷物を届けたい
+#  ↓
+# ①門番(SG)が「名簿に無い奴は通さん」と配達員を止める
+#  ↓
+# ②VMは【IAMの権限】で門番に電話「俺のIP、今日だけ名簿に入れて」（authorize）
+#  ↓ 門が開く
+# ③VMは【SSH鍵】で部屋のドアを開け、中で git pull / build / pm2 restart（EC2が実行）
+#  ↓
+# ④VMは【IAMの権限】で門番に電話「俺のIP、名簿から消して」（revoke）
