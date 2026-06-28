@@ -6,7 +6,7 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
   useEffect(() => {
     // 既に localStorage に値が入っていたら取り出す
     const saved = localStorage.getItem(key)
-    if (saved) JSON.parse(saved) as T
+    if (saved) setValue(JSON.parse(saved) as T)
   }, [key])
 
   const set = (newValue: T) => {
