@@ -11,6 +11,7 @@ jobs:
     env:
       # ダミーURL（generate/buildはDB接続しないため形式のみ据置)
       DATABASE_URL: 'mysql://user:password@localhost:3306/db'
+
     steps:
       - name: リポジトリを取得
         uses: actions/checkout@v4
@@ -30,5 +31,54 @@ jobs:
       - name: Lintを実行
         run: npm run lint
 
+      - name: testを実行
+        run: npm run test:run
+
       - name: ビルドで型・SSRエラーを検知
         run: npm run build
+
+  e2e:
+    runs-on: ubuntu-latest
+    services:
+      mysql: # 使い捨てMySQLを起動（本番DBは使わない）
+        image: mysql:8
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: testdb
+        ports: ['3306:3306']
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost"
+          --health-interval=10s --health-timeout=5s --health-retries=5
+
+    env: # buildもseedもtestも、この値を共有する
+      DATABASE_URL: 'mysql://root:root@127.0.0.1:3306/testdb'
+      JWT_SECRET: 'test-secret'
+      GUEST_EMAIL: 'guest@example.com'
+      GUEST_PASSWORD: 'guestpassword'
+      SITE_URL: 'http://localhost:3000'
+      NEXT_PUBLIC_SITE_URL: 'http://localhost:3000'
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: 依存をインストール
+        run: npm ci
+
+      - name: Prisma Client生成
+        run: npx prisma generate
+
+      - name: マイグレーション適用（空DBにテーブル作成）
+        run: npx prisma migrate deploy
+
+      - name: ゲストユーザーをseed
+        run: npx prisma db seed
+
+      - name: Playwrightブラウザをinstall
+        run: npx playwright install --with-deps chromium
+
+      - name: E2E実行（内部でbuild&startされる）
+        run: npm run test:e2e
