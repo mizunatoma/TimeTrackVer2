@@ -20,17 +20,30 @@ describe('timelineService.findRunningTimelog', () => {
 
   it('稼働中のログがあればDTOに変換して返す', async () => {
     // 1. 材料(偽ログ)を用意
-    const fakeLog = {
+    const fakeLog: NonNullable<
+      Awaited<ReturnType<typeof timelineRepository.findRunningTimelog>>
+    > = {
       id: 'log-1',
       activityId: 'act-1',
       startAt: new Date('2026-06-30T01:00:00.000Z'),
-      activity: { name: '勉強', colorToken: 'blue' },
+      endAt: null,
+      memo: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      activity: {
+        id: 'act-1',
+        profileId: 'profile-1',
+        name: '勉強',
+        colorToken: 'blue',
+        sortOrder: null,
+        deletedAt: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
     }
 
     // 2. 偽ログを返すよう設定
-    vi.mocked(timelineRepository.findRunningTimelog).mockResolvedValue(
-      fakeLog as any,
-    )
+    vi.mocked(timelineRepository.findRunningTimelog).mockResolvedValue(fakeLog)
 
     // 3. サービスを実行
     const result = await timelineService.findRunningTimelog('user-1')
@@ -50,19 +63,23 @@ describe('timelineService.findRunningTimelog', () => {
 
   it('指定した期間のログをDTOの配列に変換して返す', async () => {
     // 1. 材料(偽ログ=Prismaの生データ)を用意
-    const fakeLog = [
+    const fakeLog: Awaited<
+      ReturnType<typeof timelineRepository.findDayTimelogs>
+    > = [
       {
         id: 'log-1',
+        activityId: 'act-1',
         startAt: new Date('2026-06-30T01:00:00.000Z'),
         endAt: new Date('2026-07-01T01:00:00.000Z'),
-        activity: { name: '勉強', colorToken: 'blue' },
+        memo: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        activity: { id: 'act-1', name: '勉強', colorToken: 'blue' },
       },
     ]
 
     // 2. 偽ログの配列を返すよう設定
-    vi.mocked(timelineRepository.findDayTimelogs).mockResolvedValue(
-      fakeLog as any,
-    )
+    vi.mocked(timelineRepository.findDayTimelogs).mockResolvedValue(fakeLog)
 
     // 3. サービスを実行
     const result = await timelineService.findDayTimelogs(
