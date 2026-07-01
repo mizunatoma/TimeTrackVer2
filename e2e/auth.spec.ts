@@ -17,3 +17,16 @@ test('未ログインで保護ページにアクセスしようとすると、/s
   // 2. middlewareで /signin に飛ばされることを検証
   await expect(page).toHaveURL('/signin')
 })
+
+test('登録済みユーザ情報でログインする', async ({ page }) => {
+  // 1. goto('/signin')
+  await page.goto('/signin')
+  // 2. メール欄に .fill(ゲストのメール)
+  await page.getByLabel('メールアドレス').fill(`${process.env.GUEST_EMAIL}`)
+  // 3. パスワード欄に .fill(ゲストのパスワード)
+  await page.getByLabel('パスワード').fill(`${process.env.GUEST_PASSWORD}`)
+  // 4. 送信ボタンを .click()
+  await page.getByRole('button', { name: 'ログイン' }).click()
+  // 5. expect → toHaveURL('/user/timeline')
+  await expect(page).toHaveURL('/user/timeline')
+})

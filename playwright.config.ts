@@ -1,4 +1,5 @@
 import { defineConfig } from '@playwright/test'
+import 'dotenv/config' // .env が process.env に読み込まれる
 
 export default defineConfig({
   testDir: './e2e',
