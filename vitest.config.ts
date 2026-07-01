@@ -6,6 +6,8 @@ export default defineConfig({
   // テスト中の JSX / React を変換するために必要
   plugins: [react()],
   test: {
+    // srcの.test.tsだけ対象（e2eは見ない）
+    include: ['src/**/*.test.{ts,tsx}'],
     // Node には無いブラウザAPI(localStorage/DOM)を疑似再現する
     environment: 'jsdom',
     // 実行時は、describe/it/expect を import なしで使えるようにする
