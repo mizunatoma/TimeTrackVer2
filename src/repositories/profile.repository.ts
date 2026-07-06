@@ -23,4 +23,15 @@ export const profileRepository = {
     })
     return profile
   },
+  async updateLineUserId(id: string, lineUserId: string) {
+    const profile = await prisma.profile.update({
+      where: { id },
+      data: { lineUserId },
+      select: {
+        id: true,
+        displayName: true,
+      },
+    })
+    return profile
+  },
 }
