@@ -29,16 +29,18 @@ model User {
 }
 
 model Profile {
-  id          String     @id @default(cuid())
-  userId      String     @unique
-  user        User       @relation(fields:[userId], references:[id])
-  displayName String?
-  avatarUrl   String?
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
-  activities  Activity[]
-  routines    Routine[]
-  todoLists   TodoList[]
+  id            String     @id @default(cuid())
+  userId        String     @unique
+  user          User       @relation(fields:[userId], references:[id])
+  displayName   String?
+  avatarUrl     String?
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  activities    Activity[]
+  routines      Routine[]
+  todoLists     TodoList[]
+  lineUserId    String?         @unique
+  lineLinkToken LineLinkToken?
 }
 
 model Activity {
@@ -126,4 +128,12 @@ model RoutineState {
   lastResetAt     DateTime
   updatedAt       DateTime @updatedAt
   routine         Routine  @relation(fields: [routineId], references: [id])
+}
+
+model LineLinkToken {
+  id          String   @id @default(cuid())
+  profileId   String   @unique
+  expireAt    DateTime
+  token       String   @unique
+  profile     Profile  @relation(fields: [profileId], references: [id])
 }
