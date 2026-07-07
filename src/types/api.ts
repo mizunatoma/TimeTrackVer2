@@ -105,3 +105,6 @@ export type GetAnalyticsResponse = {
     totalMinutes: number
   }[]
 }
+//===LINE=============================================
+// POST /api/line/line-token
+export type LineLinkTokenResponse = { token: string }

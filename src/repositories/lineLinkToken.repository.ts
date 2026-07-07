@@ -11,6 +11,13 @@ export const lineLinkTokenRepository = {
     })
     return lineLinkToken
   },
+  async upsert(profileId: string, token: string, expireAt: Date) {
+    await prisma.lineLinkToken.upsert({
+      where: { profileId },
+      create: { profileId, token, expireAt },
+      update: { token, expireAt },
+    })
+  },
   async delete(token: string) {
     await prisma.lineLinkToken.delete({
       where: { token },
