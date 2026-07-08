@@ -52,8 +52,4 @@ export const lineNotificationService = {
       }
     }
   },
-
-  // async studyStartTimePush(userId: string, displayName: string) {
-  //   return await profileRepository.upsert(userId, displayName)
-  // },
 }

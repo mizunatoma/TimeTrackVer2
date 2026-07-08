@@ -13,10 +13,5 @@ export const register = async () => {
       () => lineNotificationService.todoCompletionSummary(),
       { timezone: 'Asia/Tokyo' },
     )
-    // cron.schedule(
-    //   '* * * * *',
-    //   () => lineNotificationService.studyStartTimePush(),
-    //   { timezone: 'Asia/Tokyo' },
-    // )
   }
 }
