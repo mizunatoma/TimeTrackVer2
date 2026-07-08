@@ -33,7 +33,7 @@ export const analyticsService = {
       }
       // 2回目以降
       totals[log.activityId].totalMinutes += minutes
-      // totaols = {"abc123": { name: "コーディング", colorToken: "green", totalMinutes: 120 }, "":{},...}
+      // totals = {"abc123": { name: "コーディング", colorToken: "green", totalMinutes: 120 }, "":{},...}
     }
     // Object.entries(オブジェクト名)でリスト化 => [["abc123": { name: "コーディング", colorToken: "green", totalMinutes: 120 }], ["":{}],...]
     const byCategory = Object.entries(totals).map(([id, value]) => ({
