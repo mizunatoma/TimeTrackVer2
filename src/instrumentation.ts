@@ -8,5 +8,15 @@ export const register = async () => {
       () => lineNotificationService.learningRecordSummary(),
       { timezone: 'Asia/Tokyo' },
     )
+    cron.schedule(
+      '0 21 * * *',
+      () => lineNotificationService.todoCompletionSummary(),
+      { timezone: 'Asia/Tokyo' },
+    )
+    // cron.schedule(
+    //   '* * * * *',
+    //   () => lineNotificationService.studyStartTimePush(),
+    //   { timezone: 'Asia/Tokyo' },
+    // )
   }
 }

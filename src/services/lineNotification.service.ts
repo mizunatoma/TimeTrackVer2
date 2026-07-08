@@ -1,6 +1,7 @@
-import { formatMinutes } from '@/app/_utils/format'
+import { formatMinutes, formatTime } from '@/app/_utils/format'
 import { pushTextMessage } from '@/lib/line'
 import { profileRepository } from '@/repositories/profile.repository'
+import { todoItemRepository } from '@/repositories/todo.repository'
 import { analyticsService } from './analytics.service'
 
 export const lineNotificationService = {
@@ -32,11 +33,27 @@ export const lineNotificationService = {
     }
   },
 
-  // async studyStartTimePush(userId: string, displayName: string) {
-  //   return await profileRepository.upsert(userId, displayName)
-  // },
+  async todoCompletionSummary() {
+    const profiles = await profileRepository.findAllLineLinked()
 
-  // async todoCompletionSummary(userId: string, displayName: string) {
+    for (const profile of profiles) {
+      if (!profile.lineUserId) continue // Narrowing
+
+      const todosCompletedToday =
+        await todoItemRepository.findTodosCompletedToday(profile.userId)
+
+      if (todosCompletedToday.length !== 0) {
+        const text =
+          '🚩 今日達成したTodo\n' +
+          todosCompletedToday
+            .map((todo) => `✅ ${todo.title} (${formatTime(todo.doneAt!)})`)
+            .join('\n')
+        await pushTextMessage(profile.lineUserId, text)
+      }
+    }
+  },
+
+  // async studyStartTimePush(userId: string, displayName: string) {
   //   return await profileRepository.upsert(userId, displayName)
   // },
 }
