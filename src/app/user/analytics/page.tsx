@@ -1,4 +1,5 @@
 'use client'
+import { formatMinutes, toJstParts } from '@/app/_utils/format'
 import { useFetch } from '@/app/user/_hooks/useFetch'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import type { GetAnalyticsResponse } from '@/types/api'
@@ -18,19 +19,6 @@ import {
   YAxis,
 } from 'recharts'
 import Skelton from '../_components/Skelton'
-
-// 日本時刻のYYYY-MM-DDを返す
-const toJstParts = (date: Date) => {
-  const jst = new Date(date.getTime() + 9 * 60 * 60 * 1000)
-  return jst.toISOString().split('T')[0]
-}
-
-// 分数を 〇h 〇m に変換する
-const formatMinutes = (totalMinutes: number) => {
-  const hour = Math.floor(totalMinutes / 60)
-  const mins = totalMinutes % 60
-  return mins !== 0 ? `${hour}h ${mins}m` : `${hour}h`
-}
 
 // colorTokenの Tailwind クラス名 → HEX 変換テーブル
 const COLOR_MAP: Record<string, string> = {

@@ -106,4 +106,21 @@ export const todoItemRepository = {
       data: { deletedAt: new Date() },
     })
   },
+
+  async findTodosCompletedToday(userId: string) {
+    const date = new Date().toLocaleDateString('sv-SE', {
+      timeZone: 'Asia/Tokyo',
+    })
+    const fromDay = new Date(`${date}T00:00:00.000+09:00`)
+    const toDay = new Date(`${date}T23:59:59.999+09:00`)
+    const todosCompletedToday = await prisma.todo.findMany({
+      where: {
+        todoList: { profile: { userId } },
+        isDone: true,
+        doneAt: { gte: fromDay, lte: toDay },
+        deletedAt: null,
+      },
+    })
+    return todosCompletedToday
+  },
 }
