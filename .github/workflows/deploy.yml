@@ -36,13 +36,14 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
+            set -e
             export NVM_DIR="$HOME/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
             cd /home/ubuntu/TimeTrackVer2
             git pull
             npm ci
-            npx prisma migrate deploy   
-            npm run build
+            npx prisma migrate deploy
+            NODE_OPTIONS="--max-old-space-size=1536" npm run build
             pm2 restart onetrack
 
       # 開けた門は必ず閉める（if always() = 失敗しても実行）開けたIPをピンポイントで削除
