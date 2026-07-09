@@ -23,4 +23,26 @@ export const profileRepository = {
     })
     return profile
   },
+  async findAllLineLinked() {
+    const profiles = await prisma.profile.findMany({
+      where: { lineUserId: { not: null } },
+      select: {
+        userId: true,
+        lineUserId: true,
+        displayName: true,
+      },
+    })
+    return profiles
+  },
+  async updateLineUserId(id: string, lineUserId: string) {
+    const profile = await prisma.profile.update({
+      where: { id },
+      data: { lineUserId },
+      select: {
+        id: true,
+        displayName: true,
+      },
+    })
+    return profile
+  },
 }
