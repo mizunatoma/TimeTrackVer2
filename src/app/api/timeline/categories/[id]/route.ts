@@ -29,7 +29,7 @@ export const PUT = async (
     const updated = await categoryService.updateCategories(
       category.id,
       result.data.name,
-      result.data.colorToken ?? null,
+      result.data.colorToken,
     )
 
     return NextResponse.json<CategoryResponse>(
