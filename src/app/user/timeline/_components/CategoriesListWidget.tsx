@@ -8,6 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
+import { COLOR_OPTIONS } from '@/constants/colors'
 import { categorySchema } from '@/schemas/category'
 import type { CategoriesResponse, CategoryDTO } from '@/types/api'
 import { SquarePen, Trash2 } from 'lucide-react'
@@ -32,7 +33,7 @@ export default function CategoriesListWidget({ onSelectCategory }: Props) {
     try {
       const result = categorySchema.safeParse({
         name,
-        colorToken: color || null,
+        colorToken: color || COLOR_OPTIONS[0],
       })
       if (!result.success) {
         console.error('バリデーション失敗', result.error)
@@ -59,15 +60,16 @@ export default function CategoriesListWidget({ onSelectCategory }: Props) {
   // categoryの編集
   const handleEditSave = async (name: string, color: string) => {
     try {
+      const body = {
+        name,
+        ...(color && { colorToken: color }),
+      } //  ↑ false なら展開されず渡されない
       const res = await fetch(
         `/api/timeline/categories/${editingCategory!.id}`,
         {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            name,
-            colorToken: color,
-          }),
+          body: JSON.stringify(body),
         },
       )
       if (!res.ok) {

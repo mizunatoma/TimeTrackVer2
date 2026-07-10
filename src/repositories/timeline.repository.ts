@@ -79,7 +79,7 @@ export const categoryRepository = {
     })
     return activity
   },
-  async create(userId: string, name: string, colorToken: string | null) {
+  async create(userId: string, name: string, colorToken?: string | null) {
     const activity = await prisma.activity.create({
       data: {
         name,
@@ -92,13 +92,13 @@ export const categoryRepository = {
   async update(
     categoryId: string,
     name: string | undefined,
-    colorToken: string | null,
+    colorToken?: string | null,
   ) {
     const activity = await prisma.activity.update({
       where: { id: categoryId },
       data: {
         ...(name !== undefined && { name }),
-        ...(colorToken !== undefined && { colorToken }),
+        ...(colorToken && { colorToken }),
       },
     })
     return activity

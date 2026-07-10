@@ -124,18 +124,20 @@ export const categoryService = {
     if (!category) return null
     return toCategoryDTO(category)
   },
+
   async createCategory(
     userId: string,
     name: string,
-    colorToken: string | null,
+    colorToken?: string | null,
   ) {
     const category = await categoryRepository.create(userId, name, colorToken)
     return toCategoryDTO(category)
   },
+
   async updateCategories(
     categoryId: string,
     name: string | undefined,
-    colorToken: string | null,
+    colorToken?: string | null,
   ) {
     const category = await categoryRepository.update(
       categoryId,
@@ -144,6 +146,7 @@ export const categoryService = {
     )
     return toCategoryDTO(category)
   },
+
   async deleteCategories(categoryId: string) {
     await categoryRepository.delete(categoryId)
   },
