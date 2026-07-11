@@ -59,12 +59,12 @@ export const timelineService = {
     if (!log) return null
     return toRunningTimelogResponse(log)
   },
-  async startTimelog(activityId: string) {
-    const log = await timelineRepository.createTimeLog(activityId)
+  async startTimelog(userId: string, activityId: string) {
+    const log = await timelineRepository.startTimeLogAtomic(userId, activityId)
     return toTimelogDTO(log)
   },
-  async endTimelog(runningLogId: string) {
-    const log = await timelineRepository.endTimeLog(runningLogId)
+  async endTimelog(userId: string) {
+    const log = await timelineRepository.endTimeLogAtomic(userId)
     return toTimelogDTO(log)
   },
   async parsePeriodRange(period: 'day' | 'week' | 'month', page: number) {

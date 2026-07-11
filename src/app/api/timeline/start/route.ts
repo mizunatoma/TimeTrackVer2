@@ -1,6 +1,7 @@
 // /api/timeline/start
 import { getAuthUser } from '@/app/_utils/getAuthUser'
 import { logger } from '@/lib/logger'
+import { AlreadyRunningError } from '@/repositories/timeline.repository'
 import { startTimelogSchema } from '@/schemas/timeline'
 import { timelineService } from '@/services/timeline.service'
 import type { StartTimelogResponse } from '@/types/api'
@@ -11,12 +12,6 @@ export const POST = async (request: NextRequest) => {
     const auth = await getAuthUser()
     if (auth instanceof NextResponse) return auth
     const user = auth.user
-
-    // 既に記録中のlogがないか確認する
-    const runningLog = await timelineService.findRunningTimelog(user.id)
-    if (runningLog) {
-      return NextResponse.json({ error: 'Already running' }, { status: 409 })
-    }
 
     const body = await request.json()
     const result = startTimelogSchema.safeParse(body)
@@ -38,16 +33,23 @@ export const POST = async (request: NextRequest) => {
     }
 
     // timeLogを開始する
-    const timelog = await timelineService.startTimelog(result.data.activityId)
+    const timelog = await timelineService.startTimelog(
+      user.id,
+      result.data.activityId,
+    )
 
     return NextResponse.json<StartTimelogResponse>({ timelog }, { status: 201 })
   } catch (e) {
-    logger.error('POST /timeline/start error', {
-      error: e instanceof Error ? e.stack : String(e),
-    })
-    return NextResponse.json(
-      { error: 'Internal Server Error' },
-      { status: 500 },
-    )
+    if (e instanceof AlreadyRunningError) {
+      return NextResponse.json({ error: 'Already running' }, { status: 409 })
+    } else {
+      logger.error('POST /timeline/start error', {
+        error: e instanceof Error ? e.stack : String(e),
+      })
+      return NextResponse.json(
+        { error: 'Internal Server Error' },
+        { status: 500 },
+      )
+    }
   }
 }
