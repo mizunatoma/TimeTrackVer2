@@ -49,6 +49,23 @@ export const todoListRepository = {
       data: { deletedAt: new Date() },
     })
   },
+
+  async reorder(userId: string, orderedListIds: string[]) {
+    const updatedLists = await prisma.$transaction(
+      orderedListIds.map((id, index) =>
+        prisma.todoList.update({
+          // ↑ transaction配列形式では tx ではなく prisma のまま
+          // 配列形式にはコールバックがないのでtxも存在しない。
+          where: {
+            id,
+            profile: { userId },
+          },
+          data: { sortOrder: index },
+        }),
+      ),
+    )
+    return updatedLists
+  },
 }
 
 export const todoItemRepository = {

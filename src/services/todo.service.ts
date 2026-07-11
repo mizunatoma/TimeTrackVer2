@@ -5,6 +5,8 @@ import {
 import type { TodoItemDTO, TodoListDTO } from '@/types/api'
 import type { Todo, TodoList } from '@prisma/client'
 
+export class ReorderIdsMismatchError extends Error {}
+
 const toTodoListDTO = (todoList: TodoList): TodoListDTO => ({
   id: todoList.id,
   profileId: todoList.profileId,
@@ -44,6 +46,24 @@ export const todoListService = {
   },
   async deleteTodoList(listId: string) {
     await todoListRepository.softDelete(listId)
+  },
+
+  async reorderTodoList(userId: string, orderedListIds: string[]) {
+    const ownAllLists = await todoListRepository.findAll(userId)
+    const ownIdSet = new Set(ownAllLists.map((l) => l.id))
+
+    const noDuplicates = new Set(orderedListIds).size === orderedListIds.length
+    const sameCount = orderedListIds.length === ownAllLists.length
+    const allOwned = orderedListIds.every((id) => ownIdSet.has(id))
+    if (!noDuplicates || !sameCount || !allOwned) {
+      throw new ReorderIdsMismatchError()
+    }
+
+    const reorderedLists = await todoListRepository.reorder(
+      userId,
+      orderedListIds,
+    )
+    return reorderedLists.map(toTodoListDTO)
   },
 }
 
