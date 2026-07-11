@@ -9,44 +9,42 @@ datasource db {
 
 model Contacts {
   id         String   @id @default(cuid())
-  name       String
-  email      String
-  message    String
+  name       String   @db.VarChar(50)
+  email      String   @db.VarChar(254)
+  message    String   @db.VarChar(500)
   created_at DateTime @default(now())
 }
 
 model User {
-  id           String @id @default(cuid())
-  email        String @unique
+  id           String   @id @default(cuid())
+  email        String   @unique
   passwordHash String
   resetToken   String?  @unique
   expirationDate DateTime? 
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
   profile      Profile?
-
-  @@index([email])
 }
 
 model Profile {
   id            String     @id @default(cuid())
   userId        String     @unique
   user          User       @relation(fields:[userId], references:[id])
-  displayName   String?
+  displayName   String?    @db.VarChar(50)
   avatarUrl     String?
   createdAt     DateTime   @default(now())
   updatedAt     DateTime   @updatedAt
   activities    Activity[]
   routines      Routine[]
   todoLists     TodoList[]
-  lineUserId    String?         @unique
+  lineUserId    String?    @unique
   lineLinkToken LineLinkToken?
 }
 
 model Activity {
   id         String    @id @default(cuid())
   profileId  String?
-  name       String
+  name       String    @db.VarChar(20)
   colorToken String?
   sortOrder  Int?
   deletedAt  DateTime?
@@ -61,40 +59,46 @@ model TimeLog {
   activityId String
   startAt    DateTime
   endAt      DateTime?
-  memo       String?
+  memo       String?   @db.VarChar(190)
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
   activity   Activity  @relation(fields: [activityId], references: [id])
+
+  @@index([activityId, endAt])  // 期間検索＋実行中タイマー(endAt IS NULL)検索
 }
 
 model TodoList {
   id        String    @id @default(cuid())
   profileId String
-  name      String
+  name      String    @db.VarChar(100)
   sortOrder Int
   deletedAt DateTime?
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   todos     Todo[]
   profile   Profile   @relation(fields: [profileId], references: [id])
+
+  @@index([profileId, deletedAt, sortOrder])  // リスト一覧＋並び替えをfilesortなしで返す用
 }
 
 model Todo {
   id         String    @id @default(cuid())
   todoListId String
-  title      String
+  title      String    @db.VarChar(100)
   isDone     Boolean   @default(false)
   doneAt     DateTime?
   deletedAt  DateTime?
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
   todoList   TodoList  @relation(fields: [todoListId], references: [id])
+
+  @@index([todoListId, deletedAt, createdAt])  // リスト内Todo一覧(作成順)用
 }
 
 model Routine {
   id           String        @id @default(cuid())
   profileId    String
-  name         String
+  name         String        @db.VarChar(20)
   frequency    String
   colorToken   String
   weekStart    Int
@@ -110,7 +114,7 @@ model Routine {
 model RoutineItem {
   id        String    @id @default(cuid())
   routineId String
-  title     String
+  title     String    @db.VarChar(20)
   ischecked Boolean   @default(false)
   doneAt    DateTime?
   checkedAt DateTime?
