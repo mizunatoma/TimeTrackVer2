@@ -1,16 +1,16 @@
 import z from 'zod'
 
 export const createTodoItemSchema = z.object({
-  title: z.string(),
+  title: z.string().max(100),
 })
 
 export const updateTodoItemSchema = z.object({
-  title: z.string(),
+  title: z.string().max(100),
   isDone: z.boolean(),
 })
 
 export const createTodoListSchema = z.object({
-  name: z.string(),
+  name: z.string().max(100),
 })
 
 export const reorderTodoListsSchema = z.object({
