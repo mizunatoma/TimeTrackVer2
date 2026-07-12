@@ -18,4 +18,9 @@ export const periodQuerySchema = z.object({
   page: z.coerce.number().int().max(0), //.coerce 強制する, .int() 少数を拒否
 })
 
+export const paginationQuerySchema = z.object({
+  page: z.coerce.number().int().min(1).default(1), // .default <= undefined時のみ有効 (nullは効かないのでundefinedに変換が必要)
+  limit: z.coerce.number().int().min(1).max(50).default(20),
+})
+
 export type StartTimelogRequest = z.infer<typeof startTimelogSchema>

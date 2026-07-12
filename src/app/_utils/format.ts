@@ -8,6 +8,7 @@ export const toJstParts = (date: Date) => {
 export const formatMinutes = (totalMinutes: number) => {
   const hour = Math.floor(totalMinutes / 60)
   const mins = totalMinutes % 60
+  if (hour === 0) return `${mins}m`
   return mins !== 0 ? `${hour}h ${mins}m` : `${hour}h`
 }
 

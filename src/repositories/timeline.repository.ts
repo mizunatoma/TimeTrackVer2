@@ -30,6 +30,35 @@ export const timelineRepository = {
     })
     return activity
   },
+
+  async findLogsPaginated(userId: string, skip: number, take: number) {
+    // 配列形式transaction
+    const [logs, total] = await prisma.$transaction([
+      prisma.timeLog.findMany({
+        where: {
+          activity: { profile: { userId } },
+          endAt: { not: null },
+        },
+        include: {
+          activity: {
+            select: { id: true, name: true, colorToken: true },
+          },
+        },
+        skip,
+        take,
+        orderBy: { startAt: 'desc' },
+      }),
+      prisma.timeLog.count({
+        // logの全件数を取得
+        where: {
+          activity: { profile: { userId } },
+          endAt: { not: null },
+        },
+      }),
+    ])
+    return { logs, total }
+  },
+
   async findRunningTimelog(userId: string) {
     const runningLog = await prisma.timeLog.findFirst({
       where: {
