@@ -1,7 +1,8 @@
 'use client'
 import { useState } from 'react'
-import CurrentCategoryWidget from './_components/CurrentCategoryWidget'
 import CategoriesListWidget from './_components/CategoriesListWidget'
+import CurrentCategoryWidget from './_components/CurrentCategoryWidget'
+import { LogHistoryWidget } from './_components/LogHistoryWidget'
 import TimelineWidget from './_components/TimelineWidget'
 
 export default function Page() {
@@ -13,12 +14,13 @@ export default function Page() {
     <div className="flex flex-col gap-6 p-5">
       <div className="grid gap-6 md:grid-cols-[3fr_2fr]">
         <TimelineWidget timelineKey={timelineKey} />
-        <div className="flex flex-col gap-6">
+        <div className="flex min-w-0 flex-col gap-6">
           <CurrentCategoryWidget
             currentCategoryID={selected}
             onPressStopButton={setTimelineKey}
           />
           <CategoriesListWidget onSelectCategory={setSelected} />
+          <LogHistoryWidget />
         </div>
       </div>
     </div>

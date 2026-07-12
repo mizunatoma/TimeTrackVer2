@@ -1,8 +1,11 @@
 // SWR共通化hook
-import useSWR from 'swr'
+import useSWR, { SWRConfiguration } from 'swr'
 
 // nullを渡したときは、fetchをスキップ
-export function useFetch<T>(endpoint: string | null) {
+export function useFetch<T>(
+  endpoint: string | null,
+  options?: SWRConfiguration,
+) {
   // urlを受け取り、型はジェネリクスで約束する。エラーハンドリングも明示
   const fetcher = async (url: string): Promise<T> => {
     const res = await fetch(url)
@@ -11,5 +14,5 @@ export function useFetch<T>(endpoint: string | null) {
   }
 
   // useSWRにendpoint、fetcherを渡す
-  return useSWR<T>(endpoint, fetcher)
+  return useSWR<T>(endpoint, fetcher, options)
 }

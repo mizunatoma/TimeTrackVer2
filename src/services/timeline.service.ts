@@ -54,6 +54,15 @@ export const timelineService = {
     const activity = await timelineRepository.findActivity(activityId, userId)
     return activity
   },
+  async findLogsPaginated(userId: string, page: number, limit: number) {
+    const skip = (page - 1) * limit // オフセット
+    const logsPaginated = await timelineRepository.findLogsPaginated(
+      userId,
+      skip,
+      limit,
+    )
+    return logsPaginated
+  },
   async findRunningTimelog(userId: string) {
     const log = await timelineRepository.findRunningTimelog(userId)
     if (!log) return null
