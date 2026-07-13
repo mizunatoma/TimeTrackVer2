@@ -124,7 +124,7 @@ export const todoItemRepository = {
     })
   },
 
-  async findTodosCompletedToday(userId: string) {
+  async findTodosCompletedTodayByUsers(userIds: string[]) {
     const date = new Date().toLocaleDateString('sv-SE', {
       timeZone: 'Asia/Tokyo',
     })
@@ -132,10 +132,15 @@ export const todoItemRepository = {
     const toDay = new Date(`${date}T23:59:59.999+09:00`)
     const todosCompletedToday = await prisma.todo.findMany({
       where: {
-        todoList: { profile: { userId } },
+        todoList: { profile: { userId: { in: userIds } } },
+        // IN句: 全ユーザー分を1クエリで取得（N+1回避）
         isDone: true,
         doneAt: { gte: fromDay, lte: toDay },
         deletedAt: null,
+      },
+      include: {
+        todoList: { select: { profile: { select: { userId: true } } } },
+        // 仕分け用に持ち主のuserIdだけ同乗させる（selectで転送量を最小化）
       },
     })
     return todosCompletedToday

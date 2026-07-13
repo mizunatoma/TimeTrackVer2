@@ -49,7 +49,7 @@ export type LogItemDTO = {
   id: string
   startAt: string // ISO文字列
   endAt: string
-  memo: string
+  memo: string | null
   activity: {
     id: string
     name: string
