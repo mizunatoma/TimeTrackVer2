@@ -2,6 +2,7 @@
 import { formatMinutes } from '@/app/_utils/format'
 import { COLOR_MAP } from '@/constants/colors'
 import type { GetAnalyticsResponse } from '@/types/api'
+import { memo } from 'react'
 import type { PieLabelRenderProps } from 'recharts'
 import {
   Bar,
@@ -51,7 +52,7 @@ const customizedLabel = ({
   )
 }
 
-export default function AnalyticsCharts({ chartData, yAxisTicks }: Props) {
+function AnalyticsCharts({ chartData, yAxisTicks }: Props) {
   return (
     <div>
       {/*rechartsの棒グラフ*/}
@@ -114,3 +115,7 @@ export default function AnalyticsCharts({ chartData, yAxisTicks }: Props) {
     </div>
   )
 }
+
+// 親(analytics/page.tsx)の再レンダリング時、
+// propsが同じなら重いグラフ再描画をスキップ（React.memo）
+export default memo(AnalyticsCharts)
