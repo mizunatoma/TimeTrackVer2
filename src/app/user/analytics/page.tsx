@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import type { GetAnalyticsResponse } from '@/types/api'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import dynamic from 'next/dynamic'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import Skelton from '../_components/Skelton'
 
 // 重いRechartsを初回バンドルから分離し、この画面を開いた時だけ読み込む（dynamic import）
@@ -35,19 +35,27 @@ export default function Page() {
     setCurrentDate(nextDate)
   }
 
+  // useMemoで配列の同一性を保持。依存はdataのみ
+  // yAxisTicks, chartData ↓
+
   // 全カテゴリの合計分数をもとに、棒グラフのY軸(h目盛り)の配列を作成
-  const allMinutes = data?.byCategory.map((c) => c.totalMinutes) ?? []
-  const maxMinutes = Math.max(0, ...allMinutes)
-  const yAxisTicks = Array.from(
-    { length: Math.ceil(maxMinutes / 60) + 1 },
-    (_, i) => i * 60,
-  )
+  const yAxisTicks = useMemo(() => {
+    const allMinutes = data?.byCategory.map((c) => c.totalMinutes) ?? []
+    const maxMinutes = Math.max(0, ...allMinutes)
+    return Array.from(
+      { length: Math.ceil(maxMinutes / 60) + 1 },
+      (_, i) => i * 60,
+    )
+  }, [data])
 
   // グラフ表示用データ
-  const chartData =
-    data?.byCategory
-      .filter((c) => c.totalMinutes >= 1) // 0分は非表示
-      .sort((a, b) => b.totalMinutes - a.totalMinutes) ?? [] // 降順
+  const chartData = useMemo(() => {
+    return (
+      data?.byCategory
+        .filter((c) => c.totalMinutes >= 1) // 0分は非表示
+        .sort((a, b) => b.totalMinutes - a.totalMinutes) ?? [] // 降順
+    )
+  }, [data])
 
   const daysInMonth = Number(dateTo.slice(-2)) // 当月の日数
   const sumTotalMinutes =
