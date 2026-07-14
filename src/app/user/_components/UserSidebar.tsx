@@ -16,7 +16,7 @@ const MENU_ITEMS = [
 ]
 
 interface SidebarLinkProps {
-  isCollapsed: boolean
+  isSideBarOpen: boolean
   href: string
   icon: LucideIcon
   label: string
@@ -24,7 +24,7 @@ interface SidebarLinkProps {
 }
 
 interface SidebarProps {
-  isCollapsed: boolean
+  isSideBarOpen: boolean
   toggleTodoPanel: () => void
   isTodoPanelOpen: boolean
 }
@@ -35,13 +35,13 @@ function SidebarLink({
   icon,
   label,
   isSelected,
-  isCollapsed,
+  isSideBarOpen,
 }: SidebarLinkProps) {
   const Icon = icon
   return (
     <Link
       href={href}
-      className={`flex h-12 items-center gap-3 rounded-xl transition-all ${isCollapsed ? 'justify-center' : 'px-3'} ${
+      className={`flex h-12 items-center gap-3 rounded-xl transition-all ${isSideBarOpen ? 'px-3' : 'justify-center'} ${
         isSelected
           ? 'bg-[#5D866C]/50 text-gray-800 shadow-sm'
           : 'text-gray-500 hover:bg-[#5D866C]/30'
@@ -54,13 +54,13 @@ function SidebarLink({
       >
         <Icon size={16} />
       </div>
-      {!isCollapsed && <span className="text">{label}</span>}
+      {isSideBarOpen && <span className="text">{label}</span>}
     </Link>
   )
 }
 
 export default function UserSidebar({
-  isCollapsed,
+  isSideBarOpen,
   toggleTodoPanel,
   isTodoPanelOpen,
 }: SidebarProps) {
@@ -69,7 +69,7 @@ export default function UserSidebar({
 
   return (
     <aside
-      className={`fixed inset-y-0 left-0 z-20 overflow-hidden border-r border-[#EFEDE6] bg-[#FCFAF7] px-2 py-3 ${isCollapsed ? 'w-[80px]' : 'w-[160px]'}`}
+      className={`fixed inset-y-0 left-0 z-20 overflow-hidden border-r border-[#EFEDE6] bg-[#FCFAF7] px-2 py-3 ${isSideBarOpen ? 'w-[160px]' : 'w-[80px]'}`}
     >
       <nav className="flex flex-col gap-1">
         {MENU_ITEMS.map((item) => (
@@ -77,13 +77,13 @@ export default function UserSidebar({
             key={item.href}
             {...item}
             isSelected={isSelected(item.href)}
-            isCollapsed={isCollapsed}
+            isSideBarOpen={isSideBarOpen}
           />
         ))}
 
         <button
           onClick={toggleTodoPanel}
-          className={`flex h-12 items-center gap-3 rounded-xl transition-all ${isCollapsed ? 'justify-center' : 'px-3'} ${
+          className={`flex h-12 items-center gap-3 rounded-xl transition-all ${isSideBarOpen ? 'px-3' : 'justify-center'} ${
             isTodoPanelOpen
               ? 'bg-[#5D866C]/50 text-gray-800 shadow-sm'
               : 'text-gray-500 hover:bg-[#5D866C]/30'
@@ -96,7 +96,7 @@ export default function UserSidebar({
           >
             <ClipboardList size={16} />
           </div>
-          {!isCollapsed && <span className="text">Todos</span>}
+          {isSideBarOpen && <span className="text">Todos</span>}
         </button>
       </nav>
     </aside>

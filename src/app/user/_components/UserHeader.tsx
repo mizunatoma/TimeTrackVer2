@@ -5,13 +5,13 @@ import { useRouter } from 'next/navigation'
 
 interface UserHeaderProps {
   toggleSidebar: () => void // ＝引数なし、戻り値なしの関数
-  isCollapsed: boolean
+  isSideBarOpen: boolean
   isTodoPanelOpen: boolean
 }
 
 export default function UserHeader({
   toggleSidebar,
-  isCollapsed,
+  isSideBarOpen,
   isTodoPanelOpen,
 }: UserHeaderProps) {
   const router = useRouter()
@@ -19,7 +19,7 @@ export default function UserHeader({
   const clearUser = useUserStore((state) => state.clearUser)
 
   // ４段階のヘッダー幅調整
-  const mainWidth = isCollapsed ? 80 : 160
+  const mainWidth = isSideBarOpen ? 160 : 80
   const subWidth = isTodoPanelOpen ? 300 : 0 // サブサイドバーの幅（300px）
   const totalLeft = mainWidth + subWidth // 80, 160, 380, 460 のいずれかになる
 
