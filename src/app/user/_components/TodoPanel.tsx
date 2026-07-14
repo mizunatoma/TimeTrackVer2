@@ -1,5 +1,6 @@
 'use client'
 import { useFetch } from '@/app/user/_hooks/useFetch'
+import { LoadingSpinner } from '@/components/ui/loading-spinner'
 import {
   createTodoItemSchema,
   createTodoListSchema,
@@ -13,12 +14,12 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
 interface TodoPanelProps {
-  isCollapsed: boolean
+  isSideBarOpen: boolean
   isTodoPanelOpen: boolean
 }
 
 export default function TodoPanel({
-  isCollapsed,
+  isSideBarOpen,
   isTodoPanelOpen,
 }: TodoPanelProps) {
   const [selectedListId, setSelectedListId] = useState<string | null>(null) // 開いているlist
@@ -31,6 +32,7 @@ export default function TodoPanel({
     data: list,
     mutate: mutateList,
     isValidating: isValidatingList,
+    isLoading: isLoadingList,
   } = useFetch<GetTodoListsResponse>('/api/todo-lists')
   const {
     data: todos,
@@ -189,9 +191,20 @@ export default function TodoPanel({
     } // Listを選択中であれば、そのまま
   }, [list, selectedListId])
 
+  if (isLoadingList)
+    return (
+      <aside
+        className={`fixed inset-y-0 z-20 space-y-2 overflow-auto bg-[#FCFAF7] transition-all duration-300 ${isSideBarOpen ? 'left-[160px]' : 'left-[80px]'} ${isTodoPanelOpen ? 'w-[300px] border border-[#e9e3cc] p-4' : 'w-0'}`}
+      >
+        <div className="flex justify-center py-2">
+          <LoadingSpinner />
+        </div>
+      </aside>
+    )
+
   return (
     <aside
-      className={`fixed inset-y-0 z-20 space-y-2 overflow-auto bg-[#FCFAF7] transition-all duration-300 ${isCollapsed ? 'left-[80px]' : 'left-[160px]'} ${isTodoPanelOpen ? 'w-[300px] border border-[#e9e3cc] p-4' : 'w-0'}`}
+      className={`fixed inset-y-0 z-20 space-y-2 overflow-auto bg-[#FCFAF7] transition-all duration-300 ${isSideBarOpen ? 'left-[160px]' : 'left-[80px]'} ${isTodoPanelOpen ? 'w-[300px] border border-[#e9e3cc] p-4' : 'w-0'}`}
     >
       {/*listチップ一覧*/}
       <div className="flex flex-wrap gap-1">

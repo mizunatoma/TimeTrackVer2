@@ -2,6 +2,7 @@
 import { useFetch } from '@/app/user/_hooks/useFetch'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { LoadingSpinner } from '@/components/ui/loading-spinner'
 import { GetLogsPaginatedResponse } from '@/types/api'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useState } from 'react'
@@ -17,7 +18,19 @@ export const LogHistoryWidget = () => {
     { keepPreviousData: true }, // ページ切替中も前ページを表示し続け、リストが消えてガクつくのを防ぐ  )
   )
 
-  if (!data) return <p>読み込み中...</p>
+  if (!data)
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>History</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex justify-center">
+            <LoadingSpinner />
+          </div>
+        </CardContent>
+      </Card>
+    )
 
   const totalPages = Math.ceil(data.total / LIMIT)
 

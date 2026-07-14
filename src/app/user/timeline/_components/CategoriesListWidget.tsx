@@ -8,6 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
+import { LoadingSpinner } from '@/components/ui/loading-spinner'
 import { COLOR_OPTIONS } from '@/constants/colors'
 import { categorySchema } from '@/schemas/category'
 import type { CategoriesResponse, CategoryDTO } from '@/types/api'
@@ -117,7 +118,11 @@ export default function CategoriesListWidget({ onSelectCategory }: Props) {
       </CardHeader>
 
       <CardContent>
-        {!isLoading ? (
+        {isLoading ? (
+          <div className="flex justify-center">
+            <LoadingSpinner />
+          </div>
+        ) : (
           <div className="grid grid-cols-2 gap-2 md:grid-cols-2">
             {data?.categories?.map((category) => (
               <div
@@ -166,8 +171,6 @@ export default function CategoriesListWidget({ onSelectCategory }: Props) {
               </div>
             ))}
           </div>
-        ) : (
-          <p>読み込み中...</p>
         )}
 
         {/* category追加モーダル*/}

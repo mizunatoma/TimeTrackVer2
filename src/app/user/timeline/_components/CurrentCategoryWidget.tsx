@@ -2,6 +2,7 @@
 import { useFetch } from '@/app/user/_hooks/useFetch'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { LoadingSpinner } from '@/components/ui/loading-spinner'
 import { startTimelogSchema } from '@/schemas/timeline'
 import type { GetRunningTimelogResponse } from '@/types/api'
 import {
@@ -93,11 +94,15 @@ export default function CurrentCategoryWidget({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>現在のCategory</CardTitle>
+        <CardTitle>Now Tracking</CardTitle>
       </CardHeader>
 
       <CardContent>
-        {!isLoading ? (
+        {isLoading ? (
+          <div className="flex justify-center">
+            <LoadingSpinner />
+          </div>
+        ) : (
           <div>
             <div className="mb-4 flex flex-col gap-3 rounded-xl bg-[#5D866C]/10 p-4">
               <div className="flex w-full items-center gap-3">
@@ -153,8 +158,6 @@ export default function CurrentCategoryWidget({
               )}
             </div>
           </div>
-        ) : (
-          <p>読み込み中…</p>
         )}
       </CardContent>
     </Card>

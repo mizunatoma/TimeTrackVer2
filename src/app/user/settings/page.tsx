@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { LoadingSpinner } from '@/components/ui/loading-spinner'
 import { profileSchema, UpdateProfileRequest } from '@/schemas/profile'
 import { useUserStore } from '@/store/userStore'
 import { ProfileResponse } from '@/types/api'
@@ -13,7 +14,7 @@ import { useFetch } from '../_hooks/useFetch'
 
 export default function Page() {
   const setUser = useUserStore((state) => state.setUser)
-  const { data, mutate } = useFetch<ProfileResponse>('/api/profile')
+  const { data, mutate, isLoading } = useFetch<ProfileResponse>('/api/profile')
 
   //  useForm + zodResolver(profileSchema) でフォームを初期化
   const {
@@ -58,6 +59,11 @@ export default function Page() {
           <CardTitle>プロフィール編集</CardTitle>
         </CardHeader>
         <CardContent>
+          {isLoading ? (
+          <div className="flex justify-center">
+            <LoadingSpinner />
+          </div>
+        ) : (
           <form
             onSubmit={handleSubmit((data) => {
               onSubmit(data)
@@ -87,6 +93,7 @@ export default function Page() {
               </p>
             )}
           </form>
+          )}
         </CardContent>
       </Card>
     </div>
