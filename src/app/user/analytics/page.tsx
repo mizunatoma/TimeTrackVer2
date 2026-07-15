@@ -11,7 +11,7 @@ import Skelton from '../_components/Skelton'
 // 重いRechartsを初回バンドルから分離し、この画面を開いた時だけ読み込む（dynamic import）
 const AnalyticsCharts = dynamic(
   () => import('../_components/AnalyticsCharts'),
-  { loading: () => <Skelton height="h-[600px]" /> },
+  { loading: () => <Skelton height="h-[300px]" /> },
 )
 
 export default function Page() {
@@ -85,12 +85,14 @@ export default function Page() {
 
       {isLoading ? (
         // スケルトンスクリーン シマーエフェクト
-        <Skelton height="">
-          <Skelton height="h-[350px]" />
-          <Skelton height="h-[350px]" />
+        <Skelton height="h-[382px]">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <Skelton height="h-[300px]" />
+            <Skelton height="h-[300px]" />
+          </div>
         </Skelton>
       ) : data?.byCategory.length === 0 ? (
-        <Card className="flex h-[764px] flex-col justify-center gap-4">
+        <Card className="flex h-[382px] flex-col justify-center gap-4">
           <CardContent>
             <p className="flex justify-center">この月の記録はありません</p>
           </CardContent>

@@ -54,7 +54,7 @@ const customizedLabel = ({
 
 function AnalyticsCharts({ chartData, yAxisTicks }: Props) {
   return (
-    <div>
+    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
       {/*rechartsの棒グラフ*/}
       <div className="pt-2">
         <ResponsiveContainer width="100%" height={300}>

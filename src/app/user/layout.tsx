@@ -11,11 +11,14 @@ export default function UserLayout({
 }: {
   children: React.ReactNode
 }) {
-  const [isCollapsed, setIsCollapsed] = useLocalStorage('sideBarToggle', false)
-  const toggleSidebar = () => setIsCollapsed(!isCollapsed)
+  const [isSideBarOpen, setIsSideBarOpen] = useLocalStorage(
+    'isSideBarOpen',
+    true,
+  )
+  const toggleSidebar = () => setIsSideBarOpen(!isSideBarOpen)
 
   const [isTodoPanelOpen, setIsTodoPanelOpen] = useLocalStorage(
-    'todoPanelToggle',
+    'isTodoPanelOpen',
     false,
   )
   const toggleTodoPanel = () => setIsTodoPanelOpen(!isTodoPanelOpen)
@@ -34,19 +37,22 @@ export default function UserLayout({
     <>
       <UserHeader
         toggleSidebar={toggleSidebar}
-        isCollapsed={isCollapsed}
+        isSideBarOpen={isSideBarOpen}
         isTodoPanelOpen={isTodoPanelOpen}
       />
       <UserSidebar
-        isCollapsed={isCollapsed}
+        isSideBarOpen={isSideBarOpen}
         toggleTodoPanel={toggleTodoPanel}
         isTodoPanelOpen={isTodoPanelOpen}
       />
-      <TodoPanel isTodoPanelOpen={isTodoPanelOpen} isCollapsed={isCollapsed} />
+      <TodoPanel
+        isTodoPanelOpen={isTodoPanelOpen}
+        isSideBarOpen={isSideBarOpen}
+      />
 
       <div
         className={`transition-all duration-300 ${
-          isCollapsed ? 'ml-[80px]' : 'ml-[160px]'
+          isSideBarOpen ? 'ml-[160px]' : 'ml-[80px]'
         } p-4 pt-20`}
       >
         {children}

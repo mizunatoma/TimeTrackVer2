@@ -6,6 +6,7 @@ import { Textarea } from '@/components/ui/textarea'
 import type { ContactBody } from '@/types/api'
 import Link from 'next/link'
 import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import { FormButton } from '../../components/form/FormButton'
 
 export default function ContactPage() {
@@ -23,15 +24,15 @@ export default function ContactPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
       })
-      if (res.ok) {
-        alert('送信しました')
-        reset()
-      } else {
-        alert('送信に失敗しました')
+      if (!res.ok) {
+        toast.error('送信に失敗しました')
+        return
       }
+      toast.success('送信しました')
+      reset()
     } catch (err) {
       console.error(err)
-      alert('エラーが発生しました')
+      toast.error('エラーが発生しました')
     }
   }
 

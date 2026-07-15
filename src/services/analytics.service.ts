@@ -13,7 +13,7 @@ type DayTimeLogs = Awaited<
 // 集計: logsをカテゴリ別合計に変換（analytics画面とLINE通知で共用）
 function aggregatesByCategory(logs: DayTimeLogs) {
   // 集計ロジック
-  const totals: Record<
+  const totalsByCategory: Record<
     string, // = log.activityId
     { name: string; colorToken: string | null; totalMinutes: number }
   > = {}
@@ -24,20 +24,20 @@ function aggregatesByCategory(logs: DayTimeLogs) {
       (new Date(log.endAt!).getTime() - new Date(log.startAt!).getTime()) /
         60000,
     )
-    if (!totals[log.activityId]) {
+    if (!totalsByCategory[log.activityId]) {
       // 初回：オブジェクトを作る
-      totals[log.activityId] = {
+      totalsByCategory[log.activityId] = {
         name: log.activity.name,
         colorToken: log.activity.colorToken,
         totalMinutes: 0, // 初回はまず0で作る
       }
     }
     // 2回目以降
-    totals[log.activityId].totalMinutes += minutes
-    // totals = {"abc123": { name: "コーディング", colorToken: "green", totalMinutes: 120 }, "":{},...}
+    totalsByCategory[log.activityId].totalMinutes += minutes
+    // totalsByCategory = {"abc123": { name: "コーディング", colorToken: "green", totalMinutes: 120 }, "":{},...}
   }
   // Object.entries(オブジェクト名)でリスト化 => [["abc123": { name: "コーディング", colorToken: "green", totalMinutes: 120 }], ["":{}],...]
-  const byCategory = Object.entries(totals).map(([id, value]) => ({
+  const byCategory = Object.entries(totalsByCategory).map(([id, value]) => ({
     id: id,
     name: value.name,
     colorToken: value.colorToken,

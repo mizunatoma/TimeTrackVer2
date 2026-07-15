@@ -3,6 +3,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import Link from 'next/link'
 import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import { FormButton } from '../../components/form/FormButton'
 import AuthLayout from '../_components/AuthLayout'
 
@@ -27,15 +28,14 @@ export default function Page() {
         body: JSON.stringify({ email }),
       })
       if (!res.ok) {
-        alert('リセットメールの送信に失敗しました')
+        toast.error('リセットメールの送信に失敗しました')
         return
       }
       reset()
-      alert(
-        'パスワード再設定用のメールを送信しました。\nメールボックスを確認してください。',
-      )
+      toast.success('パスワード再設定用のメールを送信しました')
     } catch (error) {
       console.log(error)
+      toast.error('エラーが発生しました')
     }
   }
 

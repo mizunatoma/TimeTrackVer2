@@ -8,11 +8,13 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
+import { LoadingSpinner } from '@/components/ui/loading-spinner'
 import { COLOR_OPTIONS } from '@/constants/colors'
 import { categorySchema } from '@/schemas/category'
 import type { CategoriesResponse, CategoryDTO } from '@/types/api'
 import { SquarePen, Trash2 } from 'lucide-react'
 import { Dispatch, SetStateAction, useState } from 'react'
+import { toast } from 'sonner'
 import CategoryModal from './CategoryModal'
 
 type Props = {
@@ -47,12 +49,14 @@ export default function CategoriesListWidget({ onSelectCategory }: Props) {
       })
 
       if (!res.ok) {
+        toast.error('追加が失敗しました')
         console.error('category追加失敗', await res.json())
         return
       }
       mutate()
       setIsOpen(false)
     } catch (e) {
+      toast.error('エラーが発生しました')
       console.error('category追加エラー：', e)
     }
   }
@@ -79,6 +83,7 @@ export default function CategoriesListWidget({ onSelectCategory }: Props) {
       mutate()
       setEditingCategory(null)
     } catch (e) {
+      toast.error('エラーが発生しました')
       console.error('category編集エラー：', e)
     }
   }
@@ -93,9 +98,10 @@ export default function CategoriesListWidget({ onSelectCategory }: Props) {
         console.error('category削除失敗', await res.json())
         return
       }
-
+      toast.success('削除しました')
       mutate()
     } catch (e) {
+      toast.error('エラーが発生しました')
       console.error('category削除エラー：', e)
     }
   }
@@ -117,7 +123,11 @@ export default function CategoriesListWidget({ onSelectCategory }: Props) {
       </CardHeader>
 
       <CardContent>
-        {!isLoading ? (
+        {isLoading ? (
+          <div className="flex justify-center">
+            <LoadingSpinner />
+          </div>
+        ) : (
           <div className="grid grid-cols-2 gap-2 md:grid-cols-2">
             {data?.categories?.map((category) => (
               <div
@@ -166,8 +176,6 @@ export default function CategoriesListWidget({ onSelectCategory }: Props) {
               </div>
             ))}
           </div>
-        ) : (
-          <p>読み込み中...</p>
         )}
 
         {/* category追加モーダル*/}
