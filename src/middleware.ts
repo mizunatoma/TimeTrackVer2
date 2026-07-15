@@ -4,6 +4,7 @@ import { jwtVerify } from './app/_lib/jwt'
 export const middleware = async (request: NextRequest) => {
   // ホワイトリスト（認証不要）
   const PUBLIC_PATH = [
+    '/',
     '/signup',
     '/api/auth/signup',
     '/signin',

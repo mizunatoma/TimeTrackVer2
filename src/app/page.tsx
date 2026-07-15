@@ -1,5 +1,3 @@
-'use client'
-
 import {
   BarChart2,
   CircleCheckBig,
@@ -7,8 +5,31 @@ import {
   Sparkles,
   TimerReset,
 } from 'lucide-react'
+import type { Metadata } from 'next'
 import Image from 'next/image' // 自動で最適化・遅延読み込み。 width と height が必須
 import Link from 'next/link'
+
+export const metadata: Metadata = {
+  title: 'OneTrack | シンプルなタイムトラッキング',
+  description:
+    '開始と終了を押すだけ。日々の活動時間を記録・可視化するシンプルなタイムトラッカー。',
+  openGraph: {
+    title: 'OneTrack | シンプルなタイムトラッキング',
+    description:
+      '開始と終了を押すだけ。日々の活動時間を記録・可視化するシンプルなタイムトラッカー。',
+    url: 'https://learning-track.com',
+    siteName: 'OneTrack',
+    images: [
+      {
+        url: 'https://learning-track.com/images/auth-illustration.png',
+        width: 1024,
+        height: 1024,
+      },
+    ],
+    locale: 'ja_JP',
+    type: 'website',
+  },
+}
 
 const forPeople = [
   {
@@ -66,10 +87,10 @@ export default function Home() {
 
           <div className="flex gap-4">
             <Link
-              href="/login"
+              href="/signin"
               className="rounded-full border border-gray-400 px-4 py-2 transition-all duration-300 hover:border-white hover:bg-[#5A8B7D]/50 hover:text-white md:px-8 md:py-4"
             >
-              Login
+              Signin
             </Link>
             <Link
               href="/signup"
@@ -102,7 +123,7 @@ export default function Home() {
                   今すぐ使う
                 </Link>
                 <Link
-                  href="/login"
+                  href="/signin"
                   className="rounded-full border border-gray-400 px-8 py-4 transition-all duration-300 hover:border-white hover:bg-[#5A8B7D]/50 hover:text-white"
                 >
                   ゲストログイン
@@ -196,7 +217,7 @@ export default function Home() {
 
         <section className="container mx-auto mb-16 flex w-full max-w-4xl flex-col items-center justify-center p-8">
           <Link
-            href="/login"
+            href="/signin"
             className="rounded-full bg-[#5A8B7D] px-6 py-4 text-white transition-all duration-300 hover:bg-[#5A8B7D]/50"
           >
             ゲストログインで 試してみる
