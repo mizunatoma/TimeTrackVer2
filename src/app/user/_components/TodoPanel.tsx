@@ -208,13 +208,13 @@ export default function TodoPanel({
     >
       {/*listチップ一覧*/}
       <div className="flex flex-wrap gap-1">
-        {list?.todoLists?.map((list) => (
+        {list?.todoLists?.map((todoList) => (
           <button
-            key={list.id}
-            className={`inline-flex items-center rounded-xl border px-2 text-sm font-medium ${list.id === selectedListId ? 'bg-[#5A8B7D]/70 text-white' : 'border border-[#5A8B7D]/70 text-[#5A8B7D]/70 hover:bg-[#5A8B7D]/70 hover:text-white'}`}
-            onClick={() => setSelectedListId(list.id)}
+            key={todoList.id}
+            className={`inline-flex items-center rounded-xl border px-2 text-sm font-medium ${todoList.id === selectedListId ? 'bg-[#5A8B7D]/70 text-white' : 'border border-[#5A8B7D]/70 text-[#5A8B7D]/70 hover:bg-[#5A8B7D]/70 hover:text-white'}`}
+            onClick={() => setSelectedListId(todoList.id)}
           >
-            {list.name}
+            {todoList.name}
           </button>
         ))}
 
