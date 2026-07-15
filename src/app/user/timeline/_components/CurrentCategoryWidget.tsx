@@ -131,7 +131,7 @@ export default function CurrentCategoryWidget({
                     </div>
                   </div>
                 ) : (
-                  <span>実行中なし</span>
+                  <span>カテゴリを選んで計測を開始</span>
                 )}
               </div>
 
