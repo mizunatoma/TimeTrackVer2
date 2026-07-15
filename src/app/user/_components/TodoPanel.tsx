@@ -11,6 +11,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Check, SquarePen, Trash2, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import { z } from 'zod'
 
 interface TodoPanelProps {
@@ -88,6 +89,8 @@ export default function TodoPanel({
       mutateList()
       mutateTodo()
     } catch (e) {
+      toast.error('エラーが発生しました')
+
       console.error('リスト作成エラー：', e)
     }
   }
@@ -102,8 +105,10 @@ export default function TodoPanel({
         console.error('リスト削除失敗', await res.json())
         return
       }
+      toast.success('削除しました')
       mutateList()
     } catch (e) {
+      toast.error('エラーが発生しました')
       console.error('リスト削除エラー：', e)
     }
   }
@@ -129,6 +134,8 @@ export default function TodoPanel({
       }
       mutateTodo()
     } catch (e) {
+      toast.error('エラーが発生しました')
+
       console.error('todo追加エラー：', e)
     }
   }
@@ -158,6 +165,8 @@ export default function TodoPanel({
       }
       mutateTodo()
     } catch (e) {
+      toast.error('エラーが発生しました')
+
       console.error('todo編集エラー：', e)
     }
   }
@@ -172,8 +181,12 @@ export default function TodoPanel({
         console.error('todo削除失敗', await res.json())
         return
       }
+      toast.success('削除しました')
+
       mutateTodo()
     } catch (e) {
+      toast.error('エラーが発生しました')
+
       console.error('todo削除エラー：', e)
     }
   }
