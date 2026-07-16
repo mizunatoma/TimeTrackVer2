@@ -19,9 +19,7 @@ export const middleware = async (request: NextRequest) => {
   ]
 
   // 公開パスはそのまま通す(早期リターン)
-  const isPublic = PUBLIC_PATH.some((path) =>
-    request.nextUrl.pathname.startsWith(path),
-  )
+  const isPublic = PUBLIC_PATH.some((path) => request.nextUrl.pathname === path)
   if (isPublic) return NextResponse.next({ request })
 
   const token = request.cookies.get('jwt')
