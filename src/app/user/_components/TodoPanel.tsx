@@ -1,5 +1,6 @@
 'use client'
 import { useFetch } from '@/app/user/_hooks/useFetch'
+import { LoadingSpinner } from '@/components/ui/loading-spinner'
 import {
   createTodoItemSchema,
   createTodoListSchema,
@@ -10,15 +11,16 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Check, SquarePen, Trash2, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import { z } from 'zod'
 
 interface TodoPanelProps {
-  isCollapsed: boolean
+  isSideBarOpen: boolean
   isTodoPanelOpen: boolean
 }
 
 export default function TodoPanel({
-  isCollapsed,
+  isSideBarOpen,
   isTodoPanelOpen,
 }: TodoPanelProps) {
   const [selectedListId, setSelectedListId] = useState<string | null>(null) // 開いているlist
@@ -31,6 +33,7 @@ export default function TodoPanel({
     data: list,
     mutate: mutateList,
     isValidating: isValidatingList,
+    isLoading: isLoadingList,
   } = useFetch<GetTodoListsResponse>('/api/todo-lists')
   const {
     data: todos,
@@ -86,6 +89,8 @@ export default function TodoPanel({
       mutateList()
       mutateTodo()
     } catch (e) {
+      toast.error('エラーが発生しました')
+
       console.error('リスト作成エラー：', e)
     }
   }
@@ -100,8 +105,10 @@ export default function TodoPanel({
         console.error('リスト削除失敗', await res.json())
         return
       }
+      toast.success('削除しました')
       mutateList()
     } catch (e) {
+      toast.error('エラーが発生しました')
       console.error('リスト削除エラー：', e)
     }
   }
@@ -127,6 +134,8 @@ export default function TodoPanel({
       }
       mutateTodo()
     } catch (e) {
+      toast.error('エラーが発生しました')
+
       console.error('todo追加エラー：', e)
     }
   }
@@ -156,6 +165,8 @@ export default function TodoPanel({
       }
       mutateTodo()
     } catch (e) {
+      toast.error('エラーが発生しました')
+
       console.error('todo編集エラー：', e)
     }
   }
@@ -170,8 +181,12 @@ export default function TodoPanel({
         console.error('todo削除失敗', await res.json())
         return
       }
+      toast.success('削除しました')
+
       mutateTodo()
     } catch (e) {
+      toast.error('エラーが発生しました')
+
       console.error('todo削除エラー：', e)
     }
   }
@@ -189,19 +204,30 @@ export default function TodoPanel({
     } // Listを選択中であれば、そのまま
   }, [list, selectedListId])
 
+  if (isLoadingList)
+    return (
+      <aside
+        className={`fixed inset-y-0 z-20 space-y-2 overflow-auto bg-[#FCFAF7] transition-all duration-300 ${isSideBarOpen ? 'left-[160px]' : 'left-[80px]'} ${isTodoPanelOpen ? 'w-[300px] border border-[#e9e3cc] p-4' : 'w-0'}`}
+      >
+        <div className="flex justify-center py-2">
+          <LoadingSpinner />
+        </div>
+      </aside>
+    )
+
   return (
     <aside
-      className={`fixed inset-y-0 z-20 space-y-2 overflow-auto bg-[#FCFAF7] transition-all duration-300 ${isCollapsed ? 'left-[80px]' : 'left-[160px]'} ${isTodoPanelOpen ? 'w-[300px] border border-[#e9e3cc] p-4' : 'w-0'}`}
+      className={`fixed inset-y-0 z-20 space-y-2 overflow-auto bg-[#FCFAF7] transition-all duration-300 ${isSideBarOpen ? 'left-[160px]' : 'left-[80px]'} ${isTodoPanelOpen ? 'w-[300px] border border-[#e9e3cc] p-4' : 'w-0'}`}
     >
       {/*listチップ一覧*/}
       <div className="flex flex-wrap gap-1">
-        {list?.todoLists?.map((list) => (
+        {list?.todoLists?.map((todoList) => (
           <button
-            key={list.id}
-            className={`inline-flex items-center rounded-xl border px-2 text-sm font-medium ${list.id === selectedListId ? 'bg-[#5A8B7D]/70 text-white' : 'border border-[#5A8B7D]/70 text-[#5A8B7D]/70 hover:bg-[#5A8B7D]/70 hover:text-white'}`}
-            onClick={() => setSelectedListId(list.id)}
+            key={todoList.id}
+            className={`inline-flex items-center rounded-xl border px-2 text-sm font-medium ${todoList.id === selectedListId ? 'bg-[#5A8B7D]/70 text-white' : 'border border-[#5A8B7D]/70 text-[#5A8B7D]/70 hover:bg-[#5A8B7D]/70 hover:text-white'}`}
+            onClick={() => setSelectedListId(todoList.id)}
           >
-            {list.name}
+            {todoList.name}
           </button>
         ))}
 

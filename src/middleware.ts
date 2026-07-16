@@ -4,6 +4,7 @@ import { jwtVerify } from './app/_lib/jwt'
 export const middleware = async (request: NextRequest) => {
   // ホワイトリスト（認証不要）
   const PUBLIC_PATH = [
+    '/',
     '/signup',
     '/api/auth/signup',
     '/signin',
@@ -18,9 +19,7 @@ export const middleware = async (request: NextRequest) => {
   ]
 
   // 公開パスはそのまま通す(早期リターン)
-  const isPublic = PUBLIC_PATH.some((path) =>
-    request.nextUrl.pathname.startsWith(path),
-  )
+  const isPublic = PUBLIC_PATH.some((path) => request.nextUrl.pathname === path)
   if (isPublic) return NextResponse.next({ request })
 
   const token = request.cookies.get('jwt')

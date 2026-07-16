@@ -44,6 +44,24 @@ export type GetRunningTimelogResponse =
         startAt: string // ISO文字列
       }
     }
+// GET /api/timeline/logs
+export type LogItemDTO = {
+  id: string
+  startAt: string // ISO文字列
+  endAt: string
+  memo: string | null
+  activity: {
+    id: string
+    name: string
+    colorToken: string | null
+  }
+}
+export type GetLogsPaginatedResponse = {
+  logs: LogItemDTO[]
+  total: number
+  page: number
+  limit: number
+}
 
 //===Category=============================================
 export type CategoryDTO = {

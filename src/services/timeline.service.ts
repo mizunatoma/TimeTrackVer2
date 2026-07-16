@@ -54,17 +54,26 @@ export const timelineService = {
     const activity = await timelineRepository.findActivity(activityId, userId)
     return activity
   },
+  async findLogsPaginated(userId: string, page: number, limit: number) {
+    const skip = (page - 1) * limit // オフセット
+    const logsPaginated = await timelineRepository.findLogsPaginated(
+      userId,
+      skip,
+      limit,
+    )
+    return logsPaginated
+  },
   async findRunningTimelog(userId: string) {
     const log = await timelineRepository.findRunningTimelog(userId)
     if (!log) return null
     return toRunningTimelogResponse(log)
   },
-  async startTimelog(activityId: string) {
-    const log = await timelineRepository.createTimeLog(activityId)
+  async startTimelog(userId: string, activityId: string) {
+    const log = await timelineRepository.startTimeLogAtomic(userId, activityId)
     return toTimelogDTO(log)
   },
-  async endTimelog(runningLogId: string) {
-    const log = await timelineRepository.endTimeLog(runningLogId)
+  async endTimelog(userId: string) {
+    const log = await timelineRepository.endTimeLogAtomic(userId)
     return toTimelogDTO(log)
   },
   async parsePeriodRange(period: 'day' | 'week' | 'month', page: number) {
@@ -124,18 +133,20 @@ export const categoryService = {
     if (!category) return null
     return toCategoryDTO(category)
   },
+
   async createCategory(
     userId: string,
     name: string,
-    colorToken: string | null,
+    colorToken?: string | null,
   ) {
     const category = await categoryRepository.create(userId, name, colorToken)
     return toCategoryDTO(category)
   },
+
   async updateCategories(
     categoryId: string,
     name: string | undefined,
-    colorToken: string | null,
+    colorToken?: string | null,
   ) {
     const category = await categoryRepository.update(
       categoryId,
@@ -144,6 +155,7 @@ export const categoryService = {
     )
     return toCategoryDTO(category)
   },
+
   async deleteCategories(categoryId: string) {
     await categoryRepository.delete(categoryId)
   },

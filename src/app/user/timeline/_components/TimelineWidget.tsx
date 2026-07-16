@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useDebounce } from '@/hooks/useDebounce'
 import type { GetTimelogResponse } from '@/types/api'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { memo, useEffect, useState } from 'react'
 
 type Props = {
   timelineKey: { count: number }
@@ -15,7 +15,7 @@ const toJstDateString = (date: Date): string => {
   return jst.toISOString().split('T')[0]
 }
 
-export default function TimelogWidget({ timelineKey }: Props) {
+function TimelogWidget({ timelineKey }: Props) {
   const hours = Array.from({ length: 24 }, (_, i) => i) // [0, 1, 2, ... 23]
   const [period] = useState<'day' | 'week' | 'month'>('day')
   const [page, setPage] = useState(0)
@@ -142,3 +142,5 @@ export default function TimelogWidget({ timelineKey }: Props) {
     </Card>
   )
 }
+
+export default memo(TimelogWidget)

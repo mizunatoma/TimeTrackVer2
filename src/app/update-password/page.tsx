@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Suspense } from 'react'
 import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import { FormButton } from '../../components/form/FormButton'
 import AuthLayout from '../_components/AuthLayout'
 
@@ -29,7 +30,7 @@ function UPdatePasswordForm() {
     try {
       const { password, confirmPassword } = data
       if (password !== confirmPassword) {
-        alert('パスワードが一致しません')
+        toast.error('パスワードが一致しません')
         return
       }
       const res = await fetch('/api/auth/update-password', {
@@ -38,14 +39,15 @@ function UPdatePasswordForm() {
         body: JSON.stringify({ password, resetToken: token }),
       })
       if (!res.ok) {
-        alert('パスワードの更新に失敗しました')
+        toast.error('パスワードの更新に失敗しました')
         return
       }
       reset()
-      alert('パスワードを更新しました')
+      toast.success('パスワードを更新しました')
       router.replace('/user/timeline')
     } catch (error) {
       console.log(error)
+      toast.error('エラーが発生しました')
     }
   }
 

@@ -2,7 +2,7 @@ import { COLOR_OPTIONS } from '@/constants/colors'
 import z from 'zod'
 
 export const categorySchema = z.object({
-  name: z.string(),
+  name: z.string().max(20),
   colorToken: z.enum(COLOR_OPTIONS).nullable(),
 })
 

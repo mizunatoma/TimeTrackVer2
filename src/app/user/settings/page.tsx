@@ -3,17 +3,19 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { LoadingSpinner } from '@/components/ui/loading-spinner'
 import { profileSchema, UpdateProfileRequest } from '@/schemas/profile'
 import { useUserStore } from '@/store/userStore'
 import { ProfileResponse } from '@/types/api'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import { useFetch } from '../_hooks/useFetch'
 
 export default function Page() {
   const setUser = useUserStore((state) => state.setUser)
-  const { data, mutate } = useFetch<ProfileResponse>('/api/profile')
+  const { data, mutate, isLoading } = useFetch<ProfileResponse>('/api/profile')
 
   //  useForm + zodResolver(profileSchema) でフォームを初期化
   const {
@@ -34,9 +36,10 @@ export default function Page() {
         body: JSON.stringify({ displayName }),
       })
       if (!res.ok) {
-        alert('更新に失敗しました')
+        toast.error('更新に失敗しました')
         return
       }
+      toast.success('プロフィールを更新しました')
       const json: ProfileResponse = await res.json()
       setUser(json.profile)
       mutate()
@@ -58,35 +61,41 @@ export default function Page() {
           <CardTitle>プロフィール編集</CardTitle>
         </CardHeader>
         <CardContent>
-          <form
-            onSubmit={handleSubmit((data) => {
-              onSubmit(data)
-              reset()
-            })}
-            className="flex flex-col gap-2"
-          >
-            <Label htmlFor="displayName">表示名</Label>
-            <div className="flex gap-2">
-              <Input
-                id="displayName"
-                disabled={isSubmitting}
-                placeholder="ゲストさん"
-                {...register('displayName')}
-              />
-              <Button
-                disabled={isSubmitting}
-                type="submit"
-                className="shrink-0"
-              >
-                {isSubmitting ? '更新中...' : '更新'}
-              </Button>
+          {isLoading ? (
+            <div className="flex justify-center">
+              <LoadingSpinner />
             </div>
-            {errors.displayName && (
-              <p className="text-sm text-red-500">
-                {errors.displayName.message}
-              </p>
-            )}
-          </form>
+          ) : (
+            <form
+              onSubmit={handleSubmit((data) => {
+                onSubmit(data)
+                reset()
+              })}
+              className="flex flex-col gap-2"
+            >
+              <Label htmlFor="displayName">表示名</Label>
+              <div className="flex gap-2">
+                <Input
+                  id="displayName"
+                  disabled={isSubmitting}
+                  placeholder="ゲストさん"
+                  {...register('displayName')}
+                />
+                <Button
+                  disabled={isSubmitting}
+                  type="submit"
+                  className="shrink-0"
+                >
+                  {isSubmitting ? '更新中...' : '更新'}
+                </Button>
+              </div>
+              {errors.displayName && (
+                <p className="text-sm text-red-500">
+                  {errors.displayName.message}
+                </p>
+              )}
+            </form>
+          )}
         </CardContent>
       </Card>
     </div>
