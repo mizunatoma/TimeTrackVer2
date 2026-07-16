@@ -1,4 +1,3 @@
-'use client'
 import { LineRegistration } from './_components/LineRegistration'
 import { ProfileNameSetting } from './_components/ProfileNameSetting'
 
