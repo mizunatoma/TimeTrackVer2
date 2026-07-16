@@ -19,6 +19,7 @@ export const profileRepository = {
       select: {
         id: true,
         displayName: true,
+        lineUserId: true,
       },
     })
     return profile
@@ -41,6 +42,7 @@ export const profileRepository = {
       select: {
         id: true,
         displayName: true,
+        lineUserId: true,
       },
     })
     return profile
