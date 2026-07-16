@@ -1,3 +1,4 @@
+import { pushTextMessage } from '@/lib/line'
 import { lineLinkTokenRepository } from '@/repositories/lineLinkToken.repository'
 import { profileRepository } from '@/repositories/profile.repository'
 import crypto from 'crypto'
@@ -31,6 +32,7 @@ export const lineLinkTokenService = {
       }
       // 3-c. 有効 → 連携成立、トークンは使い捨て
       await profileRepository.updateLineUserId(record.profileId, lineUserId)
+      await pushTextMessage(lineUserId, '連携が完了しました🎉')
       await lineLinkTokenRepository.delete(event.message.text)
     }
   },

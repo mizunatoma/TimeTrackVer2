@@ -1,0 +1,101 @@
+'use client'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { LoadingSpinner } from '@/components/ui/loading-spinner'
+import { profileSchema, UpdateProfileRequest } from '@/schemas/profile'
+import { useUserStore } from '@/store/userStore'
+import { ProfileResponse } from '@/types/api'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useEffect } from 'react'
+import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
+import { useFetch } from '../../_hooks/useFetch'
+
+export const ProfileNameSetting = () => {
+  const setUser = useUserStore((state) => state.setUser)
+  const { data, mutate, isLoading } = useFetch<ProfileResponse>('/api/profile')
+
+  //  useForm + zodResolver(profileSchema) でフォームを初期化
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+    reset,
+  } = useForm<UpdateProfileRequest>({
+    resolver: zodResolver(profileSchema),
+  })
+
+  const onSubmit = async (data: UpdateProfileRequest) => {
+    try {
+      const { displayName } = data
+      const res = await fetch('/api/profile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ displayName }),
+      })
+      if (!res.ok) {
+        toast.error('更新に失敗しました')
+        return
+      }
+      toast.success('プロフィールを更新しました')
+      const json: ProfileResponse = await res.json()
+      setUser(json.profile)
+      mutate()
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  useEffect(() => {
+    if (data?.profile?.displayName) {
+      reset({ displayName: data.profile.displayName })
+    }
+  }, [data, reset])
+
+  return (
+    <Card className="max-w-md">
+      <CardHeader>
+        <CardTitle>プロフィール編集</CardTitle>
+      </CardHeader>
+      <CardContent>
+        {isLoading ? (
+          <div className="flex justify-center">
+            <LoadingSpinner />
+          </div>
+        ) : (
+          <form
+            onSubmit={handleSubmit((data) => {
+              onSubmit(data)
+              reset()
+            })}
+            className="flex flex-col gap-2"
+          >
+            <Label htmlFor="displayName">表示名</Label>
+            <div className="flex gap-2">
+              <Input
+                id="displayName"
+                disabled={isSubmitting}
+                placeholder="ゲストさん"
+                {...register('displayName')}
+              />
+              <Button
+                disabled={isSubmitting}
+                type="submit"
+                className="shrink-0"
+              >
+                {isSubmitting ? '更新中...' : '更新'}
+              </Button>
+            </div>
+            {errors.displayName && (
+              <p className="text-sm text-red-500">
+                {errors.displayName.message}
+              </p>
+            )}
+          </form>
+        )}
+      </CardContent>
+    </Card>
+  )
+}

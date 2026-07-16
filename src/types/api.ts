@@ -9,6 +9,7 @@ export type ContactBody = {
 export type ProfileDTO = {
   id: string
   displayName: string | null
+  lineUserId: string | null
 }
 
 // GET,PUT, POST /api/profile
