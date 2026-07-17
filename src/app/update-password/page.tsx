@@ -30,13 +30,16 @@ function UPdatePasswordForm() {
     try {
       const { password, confirmPassword } = data
       if (password !== confirmPassword) {
-        toast.error('パスワードが一致しません')
+        toast.error('パスワードが一致していません')
+        return
+      } else if (password.length < 8) {
+        toast.error('パスワードは８文字以上にしてください')
         return
       }
       const res = await fetch('/api/auth/update-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password, resetToken: token }),
+        body: JSON.stringify({ password, resetToken: token, confirmPassword }),
       })
       if (!res.ok) {
         toast.error('パスワードの更新に失敗しました')

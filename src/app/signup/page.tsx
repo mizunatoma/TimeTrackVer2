@@ -5,6 +5,7 @@ import { Label } from '@/components/ui/label'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import AuthLayout from '../_components/AuthLayout'
 
 type LoginForm = {
@@ -24,11 +25,18 @@ export default function Page() {
 
   const onSubmit = async (data: LoginForm) => {
     try {
-      const { email, password } = data
+      const { email, password, confirmPassword } = data
+      if (password !== confirmPassword) {
+        toast.error('パスワードが一致していません')
+        return
+      } else if (password.length < 8) {
+        toast.error('パスワードは８文字以上にしてください')
+        return
+      }
       const res = await fetch('/api/auth/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email, password, confirmPassword }),
       })
       if (!res.ok) {
         alert('登録に失敗しました')
