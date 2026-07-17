@@ -12,8 +12,8 @@ export type ProfileDTO = {
   lineUserId: string | null
 }
 
-// GET,PUT, POST /api/profile
-export type ProfileResponse = { profile: ProfileDTO }
+// GET, POST /api/profile
+export type ProfileResponse = { profile: ProfileDTO; isGuest: boolean }
 
 //===Timelog=============================================
 export type TimelogDTO = {

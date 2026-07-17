@@ -13,7 +13,8 @@ export const LineRegistration = () => {
   const [token, setToken] = useState('')
   const { data, mutate } = useFetch<ProfileResponse>('/api/profile')
 
-  const isLinked = !!data?.profile?.lineUserId
+  const isGuest = data?.isGuest ?? false // 元がbooleanなら、 ?? false
+  const isLinked = !!data?.profile?.lineUserId // booleanじゃない値を真偽化するなら、 !!
 
   const issueToken = async () => {
     setIsLoading(true)
@@ -58,7 +59,11 @@ export const LineRegistration = () => {
         /> */}
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
-        {isLinked ? (
+        {isGuest ? (
+          <p className="text-muted-foreground text-sm">
+            ※ ゲストログインではご利用いただけません
+          </p>
+        ) : isLinked ? (
           <p className="text-sm text-green-600">✅ 連携済みです</p>
         ) : (
           <>
