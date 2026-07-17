@@ -10,6 +10,13 @@ export const POST = async () => {
     if (auth instanceof NextResponse) return auth
     const user = auth.user
 
+    if (auth.isGuest) {
+      return NextResponse.json(
+        { error: 'LINE連携は通常アカウントでご利用いただけます' },
+        { status: 403 },
+      )
+    }
+
     const token = await lineLinkTokenService.issueToken(user.id)
     if (!token) {
       return NextResponse.json({ error: 'Not found' }, { status: 404 })
