@@ -1,26 +1,25 @@
 import * as jose from 'jose'
 
-// signJWT(userId) → JWTを作って返す関数
-export async function signJWT(userId: string) {
-  const secret = new TextEncoder().encode(process.env.JWT_SECRET)
+// JWTを作成する関数
+export async function signJWT(userId: string, isGuest?: boolean) {
   const alg = 'HS256'
-  const jwt = await new jose.SignJWT({ userId })
+  const secret = new TextEncoder().encode(process.env.JWT_SECRET)
+  const jwt = await new jose.SignJWT({ userId, isGuest }) // JWTに userId, isGuest のキーを追加
+    // Base64は誰でもデコードできるので、キーについて、改ざんはできないが閲覧される可能性あり
     .setProtectedHeader({ alg })
-    .setIssuedAt()
-    .setIssuer('urn:example:issuer')
-    .setAudience('urn:example:audience')
+    .setIssuedAt() // 発行日時を記録する
     .setExpirationTime('24h') // サーバーが「このトークンがいつ失効するか」を検証する
     .sign(secret)
   return jwt
 }
 
-// verifyJWT(token) → JWTを検証して中身を返す関数
+// JWTを検証して中身を返す関数
 export async function jwtVerify(token: string) {
   const secret = new TextEncoder().encode(process.env.JWT_SECRET)
-  const { payload } = await jose.jwtVerify<{ userId: string }>(token, secret, {
-    issuer: 'urn:example:issuer',
-    audience: 'urn:example:audience',
-  })
+  const { payload } = await jose.jwtVerify<{
+    userId: string
+    isGuest: boolean
+  }>(token, secret)
   return { payload }
 }
 

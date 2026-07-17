@@ -27,7 +27,7 @@ export const POST = async (request: NextRequest) => {
 
     // 3. 一致したらJWTトークンを発行・Cookie にセット
     if (isMatch) {
-      await authService.issueToken(user.id)
+      await authService.issueToken(user.id, user.email)
     } else {
       return NextResponse.json(
         { message: 'Authentication error' },
