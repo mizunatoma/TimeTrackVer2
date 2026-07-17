@@ -6,38 +6,48 @@ export const middleware = async (request: NextRequest) => {
   const PUBLIC_PATH = [
     '/',
     '/signup',
-    '/api/auth/signup',
     '/signin',
-    '/api/auth/signin',
     '/reset-password',
+    '/update-password',
+
+    '/api/auth/signup',
+    '/api/auth/signin',
     '/api/auth/reset-password',
     '/api/auth/callback',
-    '/update-password',
     '/api/auth/update-password',
     '/api/auth/guest',
     '/api/line/webhook',
   ]
 
-  // 公開パスはそのまま通す(早期リターン)
   const isPublic = PUBLIC_PATH.some((path) => request.nextUrl.pathname === path)
-  if (isPublic) return NextResponse.next({ request })
+  if (isPublic) return NextResponse.next({ request }) // 公開パスはそのまま通す
 
+  const isApi = request.nextUrl.pathname.startsWith('/api')
   const token = request.cookies.get('jwt')
-  // token がなければ /login へリダイレクト
+
+  // token がなく、APIなら401、画面ならリダイレクト
   if (!token) {
-    const url = request.nextUrl.clone()
-    url.pathname = '/signin'
-    return NextResponse.redirect(url)
+    if (isApi) {
+      return NextResponse.json({ message: 'Unauthorized' }, { status: 401 })
+    } else {
+      const url = request.nextUrl.clone()
+      url.pathname = '/signin'
+      return NextResponse.redirect(url)
+    }
   }
 
-  // tokenを検証してリダイレクト
+  // tokenを検証し、APIなら401、画面ならリダイレクト
   try {
     await jwtVerify(token.value)
     return NextResponse.next({ request })
   } catch {
-    const url = request.nextUrl.clone()
-    url.pathname = '/signin'
-    return NextResponse.redirect(url)
+    if (isApi) {
+      return NextResponse.json({ message: 'Unauthorized' }, { status: 401 })
+    } else {
+      const url = request.nextUrl.clone()
+      url.pathname = '/signin'
+      return NextResponse.redirect(url)
+    }
   }
 }
 
