@@ -3,8 +3,15 @@ import { prisma } from '@/app/_utils/prisma'
 export const userRepository = {
   async create(passwordHash: string, email: string) {
     const user = await prisma.user.create({
-      data: { passwordHash, email },
+      data: {
+        passwordHash,
+        email,
+        profile: {
+          create: {},
+        },
+      },
     })
+
     return user
   },
 
