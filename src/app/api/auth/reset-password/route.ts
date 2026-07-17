@@ -13,7 +13,10 @@ export const POST = async (request: NextRequest) => {
     // email でユーザーを検索
     const user = await authService.findUser(result.data.email)
     if (!user) {
-      return NextResponse.json({ message: 'Unauthorized' }, { status: 401 })
+      return NextResponse.json(
+        { message: 'Authentication error' },
+        { status: 401 },
+      )
     }
 
     // resetToken と expirationDate をDBに保存
