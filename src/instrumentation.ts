@@ -16,7 +16,7 @@ export const register = async () => {
     )
 
     const { guestResetService } = await import('@/services/guestReset.service') // 動的import
-    cron.schedule('* * * * *', () => guestResetService.reset(), {
+    cron.schedule('0 5 * * *', () => guestResetService.reset(), {
       // seedと同様
       timezone: 'Asia/Tokyo',
     })
