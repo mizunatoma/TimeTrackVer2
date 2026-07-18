@@ -1,14 +1,15 @@
 'use client'
-import { Button } from '@/components/ui/button'
+import { Button, buttonVariants } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { cn } from '@/lib/utils'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { FormButton } from '../../components/form/FormButton'
 import OrDivider from '../../components/form/OrDivider'
 import AuthLayout from '../_components/AuthLayout'
+import GuestLogin from '../_components/GuestLogin'
 
 type LoginForm = {
   email: string
@@ -16,7 +17,6 @@ type LoginForm = {
 }
 
 export default function Page() {
-  const [loading, setLoading] = useState(false) // ゲストログイン用
   const router = useRouter()
   const {
     register,
@@ -39,25 +39,6 @@ export default function Page() {
       router.replace('/user/timeline')
     } catch (error) {
       console.log(error)
-    }
-  }
-
-  const guestLogin = async () => {
-    setLoading(true)
-    try {
-      const res = await fetch('/api/auth/guest', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-      })
-      if (!res.ok) {
-        alert('ログインに失敗しました')
-        return
-      }
-      router.replace('/user/timeline')
-    } catch (error) {
-      console.log(error)
-    } finally {
-      setLoading(false)
     }
   }
 
@@ -132,12 +113,12 @@ export default function Page() {
             />
             */}
 
-        <FormButton
-          onClick={guestLogin}
-          loading={loading}
+        <GuestLogin
+          className={cn(
+            buttonVariants({ variant: 'outline' }),
+            'h-11 w-full rounded-lg',
+          )}
           label="ゲストで見る"
-          type="button"
-          variant="secondary"
         />
       </form>
     </AuthLayout>
