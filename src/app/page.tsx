@@ -8,6 +8,7 @@ import {
 import type { Metadata } from 'next'
 import Image from 'next/image' // 自動で最適化・遅延読み込み。 width と height が必須
 import Link from 'next/link'
+import GuestLogin from './_components/GuestLogin'
 
 export const metadata: Metadata = {
   title: 'OneTrack | 資格学習のためのタイムトラッキング',
@@ -45,15 +46,15 @@ const forPeople = [
     iconColor: 'text-[#173324]',
     bgColor: 'bg-[#C9EAD4]',
     title: '勉強量が見えない',
-    context:
-      '勉強したつもりでも、実際に何時間積めたのか分からず不安になる。',
+    context: '勉強したつもりでも、実際に何時間積めたのか分からず不安になる。',
   },
   {
     icon: Flame,
     iconColor: 'text-[#442427]',
     bgColor: 'bg-[#FFDADB]',
     title: '独学を続けたい',
-    context: 'ひとりの勉強は孤独。積み上げが見える仕組みを、続ける力に変えたい。',
+    context:
+      'ひとりの勉強は孤独。積み上げが見える仕組みを、続ける力に変えたい。',
   },
 ]
 
@@ -82,7 +83,7 @@ const supportFeatures = [
   },
 ]
 
-// スクショを「実際の画面」らしく見せるブラウザ風フレーム
+// スクショを実際の画面らしく見せる ブラウザ風フレーム
 const BrowserFrame = ({ src, alt }: { src: string; alt: string }) => (
   <div className="overflow-hidden rounded-xl border-4 border-white bg-white shadow-[0_24px_60px_rgba(23,51,36,0.3)] ring-1 ring-black/10">
     <div className="flex gap-1.5 border-b border-[#E2E6E4] bg-[#F0F3F1] px-4 py-2.5">
@@ -139,12 +140,12 @@ export default function Home() {
               >
                 無料で始める
               </Link>
-              <Link
-                href="/signin"
-                className="text-[#4B4B4B] underline underline-offset-4 transition-colors duration-300 hover:text-[#3D5E4E]"
-              >
-                ゲストで試す
-              </Link>
+              <GuestLogin
+                label={'ゲストで試す'}
+                className={
+                  'text-[#4B4B4B] underline underline-offset-4 transition-colors duration-300 hover:text-[#3D5E4E]'
+                }
+              />
             </div>
           </div>
           <div className="w-full flex-1 md:w-auto md:flex-[1.2]">
@@ -181,7 +182,7 @@ export default function Home() {
           </ul>
         </section>
 
-        {/* 主な機能（縦に1枚ずつ・交互） */}
+        {/* 主な機能 */}
         <section className="mx-auto flex max-w-6xl flex-col gap-16 px-6 py-16 md:gap-24 md:px-16 md:py-24">
           <div className="flex flex-col items-center gap-8 md:flex-row md:gap-16">
             <div className="w-full md:flex-[1.2]">
@@ -214,7 +215,9 @@ export default function Home() {
               <p className="mb-3 font-mono text-sm font-bold tracking-[0.2em] text-[#3D5E4E]">
                 02 — ANALYZE
               </p>
-              <h2 className="mb-3 text-2xl font-semibold">学習アナリティクス</h2>
+              <h2 className="mb-3 text-2xl font-semibold">
+                学習アナリティクス
+              </h2>
               <p className="text-[#4B4B4B]">
                 月次グラフで学習時間のクセを可視化。「やったつもり」と実績のギャップをなくします。
               </p>
@@ -223,7 +226,7 @@ export default function Home() {
 
           <div className="flex flex-col items-center gap-8 md:flex-row md:gap-16">
             <div className="flex w-full justify-center md:flex-[1.2]">
-              {/* 試験日カウントダウンのモックUI（Phase 5実装予定機能の見本） */}
+              {/* 試験日カウントダウンのモックUI */}
               <div className="w-full max-w-md rounded-2xl bg-[#3D5E4E] p-10 text-white shadow-[0_24px_60px_rgba(61,94,78,0.25)]">
                 <p className="mb-2 font-mono text-xs tracking-[0.25em] text-white/70">
                   GOAL
@@ -295,15 +298,12 @@ export default function Home() {
           <p className="mb-9 text-white/80">
             合格までの積み上げは、最初の記録から始まります。
           </p>
-          <Link
-            href="/signin"
-            className="rounded-full bg-white px-10 py-4 text-base text-[#3D5E4E] transition-all duration-300 hover:bg-[#D8E8C2]"
-          >
-            ゲストで試してみる
-          </Link>
-          <p className="mt-4 text-sm text-white/70">
-            登録不要。ログイン画面の「ゲストで見る」からすぐに試せます
-          </p>
+          <GuestLogin
+            label={'ゲストで試してみる'}
+            className={
+              'rounded-full bg-white px-10 py-4 text-base text-[#3D5E4E] transition-all duration-300 hover:bg-[#D8E8C2]'
+            }
+          />
         </section>
       </main>
 

@@ -10,7 +10,7 @@ export const POST = async () => {
       return NextResponse.json({ message: 'Not found' }, { status: 404 })
     }
     //JWTトークンを発行して Cookie にセット
-    await authService.issueToken(guestUser.id)
+    await authService.issueToken(guestUser.id, guestUser.email)
 
     return NextResponse.json(null, { status: 200 })
   } catch {

@@ -16,7 +16,10 @@ export const GET = async () => {
     if (!profile) {
       return NextResponse.json({ error: 'Not found' }, { status: 401 })
     }
-    return NextResponse.json<ProfileResponse>({ profile }, { status: 200 })
+    return NextResponse.json<ProfileResponse>(
+      { profile, isGuest: auth.isGuest },
+      { status: 200 },
+    )
   } catch (e) {
     logger.error('GET /profile error', {
       error: e instanceof Error ? e.stack : String(e),
@@ -46,7 +49,10 @@ export const POST = async (request: NextRequest) => {
       result.data.displayName,
     )
 
-    return NextResponse.json<ProfileResponse>({ profile }, { status: 200 })
+    return NextResponse.json<ProfileResponse>(
+      { profile, isGuest: auth.isGuest },
+      { status: 200 },
+    )
   } catch (e) {
     logger.error('POST /profile error', {
       error: e instanceof Error ? e.stack : String(e),

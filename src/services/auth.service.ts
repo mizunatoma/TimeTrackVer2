@@ -28,11 +28,12 @@ export const authService = {
     return isMatch
   },
   // jose で JWTトークンを発行して Cookie にセット
-  async issueToken(userId: string) {
-    const jwt = await signJWT(userId)
+  async issueToken(userId: string, email: string) {
+    const isGuest = email === process.env.GUEST_EMAIL // ゲストユーザーか判定
+    const jwt = await signJWT(userId, isGuest)
     const cookieStore = await cookies()
     cookieStore.set('jwt', jwt, { ...JWT_COOKIE_OPTIONS })
-    return jwt
+    return { jwt, isGuest }
   },
   // Cookie のJWTトークンを削除
   async deleteToken() {
