@@ -127,3 +127,16 @@ export type GetAnalyticsResponse = {
 //===LINE=============================================
 // POST /api/line/line-token
 export type LineLinkTokenResponse = { token: string }
+
+//===Goal=============================================
+export type GoalDTO = {
+  id: string
+  qualificationName: string
+  examDate: string
+  targetStudyTime: number
+  createdAt: string
+  updatedAt: string
+}
+
+// GET, PUT /api/goal
+export type GoalResponse = { goal: GoalDTO | null }
