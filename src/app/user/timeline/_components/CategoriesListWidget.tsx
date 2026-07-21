@@ -95,7 +95,12 @@ export default function CategoriesListWidget({ onSelectCategory }: Props) {
         method: 'DELETE',
       })
       if (!res.ok) {
-        console.error('category削除失敗', await res.json())
+        const body = await res.json()
+        if (res.status === 403) {
+          toast.error('ゲストアカウントでは削除できません')
+          return
+        }
+        console.error('削除が失敗しました', body)
         return
       }
       toast.success('削除しました')

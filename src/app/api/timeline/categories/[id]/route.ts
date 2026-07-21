@@ -56,6 +56,13 @@ export const DELETE = async (
     if (auth instanceof NextResponse) return auth
     const user = auth.user
 
+    if (auth.isGuest) {
+      return NextResponse.json(
+        { error: 'Authorization failure' },
+        { status: 403 },
+      )
+    }
+
     const category = await categoryService.findCategory(params.id, user.id)
     if (!category) {
       return NextResponse.json({ error: 'Not found' }, { status: 404 })
