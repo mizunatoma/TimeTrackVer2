@@ -39,6 +39,7 @@ model Profile {
   todoLists     TodoList[]
   lineUserId    String?    @unique
   lineLinkToken LineLinkToken?
+  goal          Goal?
 }
 
 model Activity {
@@ -140,4 +141,15 @@ model LineLinkToken {
   expireAt    DateTime
   token       String   @unique
   profile     Profile  @relation(fields: [profileId], references: [id])
+}
+
+model Goal {
+  id                  String   @id @default(cuid())
+  profileId           String   @unique
+  qualificationName   String    @db.VarChar(20)
+  examDate            DateTime 
+  targetStudyTime     Int
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  profile             Profile  @relation(fields: [profileId], references: [id])
 }
