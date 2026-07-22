@@ -11,7 +11,7 @@ export const goalRepository = {
   async upsert(
     profileId: string,
     qualificationName: string,
-    examDate: string,
+    examDate: Date,
     targetStudyTime: number,
   ) {
     const goal = await prisma.goal.upsert({
