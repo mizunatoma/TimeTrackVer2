@@ -2,7 +2,7 @@
 import { formatMinutes, toJstParts } from '@/app/_utils/format'
 import { useFetch } from '@/app/user/_hooks/useFetch'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import type { GetAnalyticsResponse } from '@/types/api'
+import type { GetAnalyticsResponse, GoalResponse } from '@/types/api'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { useMemo, useState } from 'react'
@@ -20,9 +20,15 @@ export default function Page() {
   const dateTo = toJstParts(
     new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0),
   ) //dateToの末尾「,0」 => 次の月の0日目 => 今月の最終日
+
   const { data, error, isLoading } = useFetch<GetAnalyticsResponse>(
     `/api/analytics?from=${dateFrom}&to=${dateTo}`,
   )
+  const {
+    data: goalData,
+    error: goalError,
+    isLoading: isGoalLoading,
+  } = useFetch<GoalResponse>('/api/goal')
 
   // 月切替ナビボタン
   const handleNavButton = (direction: number) => {
@@ -61,8 +67,11 @@ export default function Page() {
   const sumTotalMinutes =
     data?.byCategory.reduce((sum, item) => sum + item.totalMinutes, 0) ?? 0 // 記録総時間
   const avgMinutes = Math.floor(sumTotalMinutes / daysInMonth) // 1日平均記録時間
+  const goalProgressPercent = goalData?.goal?.targetStudyTime
+    ? Math.round((sumTotalMinutes / (goalData.goal.targetStudyTime * 60)) * 100)
+    : '未設定'
 
-  if (error) return <p>エラーが発生しました</p>
+  if (error || goalError) return <p>エラーが発生しました</p>
 
   return (
     <div className="flex flex-col gap-4 p-4">
@@ -83,7 +92,7 @@ export default function Page() {
         </CardHeader>
       </Card>
 
-      {isLoading ? (
+      {isLoading || isGoalLoading ? (
         // スケルトンスクリーン シマーエフェクト
         <Skelton height="h-[382px]">
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -103,6 +112,12 @@ export default function Page() {
             <div className="flex w-full items-center justify-center gap-4">
               <p>総時間 : {formatMinutes(sumTotalMinutes)}</p>
               <p>平均時間 : {formatMinutes(avgMinutes)} / 日</p>
+              <p>
+                目標達成率 :{' '}
+                {typeof goalProgressPercent === 'number'
+                  ? goalProgressPercent + '%'
+                  : goalProgressPercent}
+              </p>
             </div>
             <AnalyticsCharts chartData={chartData} yAxisTicks={yAxisTicks} />
           </CardContent>
