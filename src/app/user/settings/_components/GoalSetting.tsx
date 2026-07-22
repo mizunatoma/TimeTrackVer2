@@ -10,6 +10,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
+import z from 'zod'
 import { useFetch } from '../../_hooks/useFetch'
 
 export const GoalNameSetting = () => {
@@ -20,9 +21,12 @@ export const GoalNameSetting = () => {
     handleSubmit,
     formState: { errors, isSubmitting },
     reset,
-  } = useForm<GoalRequest>({
-    resolver: zodResolver(goalSchema),
-  })
+  } = useForm<z.input<typeof goalSchema>, unknown, z.output<typeof goalSchema>>(
+    // z.coerce.number()でZodの入力型と出力型が異なるため、useFormに変換前と変換後の型を指定
+    {
+      resolver: zodResolver(goalSchema),
+    },
+  )
 
   const onSubmit = async (data: GoalRequest) => {
     try {
@@ -44,8 +48,12 @@ export const GoalNameSetting = () => {
   }
 
   useEffect(() => {
-    if (data?.goal?.qualificationName) {
-      reset({ qualificationName: data.goal.qualificationName })
+    if (data?.goal) {
+      reset({
+        qualificationName: data.goal.qualificationName,
+        examDate: data.goal.examDate.slice(0, 10),
+        targetStudyTime: data.goal.targetStudyTime,
+      })
     }
   }, [data, reset])
 
@@ -67,12 +75,15 @@ export const GoalNameSetting = () => {
             })}
             className="flex flex-col gap-2"
           >
-            <Label htmlFor="qualificationName">資格名：</Label>
-            <div className="flex gap-2">
+            <div className="flex items-center gap-2">
+              <Label htmlFor="qualificationName" className="w-28 shrink-0">
+                資格名：
+              </Label>
               <Input
                 id="qualificationName"
                 disabled={isSubmitting}
-                placeholder="ゲストさん"
+                placeholder="基本情報技術者試験"
+                className="flex-1"
                 {...register('qualificationName')}
               />
             </div>
@@ -82,12 +93,15 @@ export const GoalNameSetting = () => {
               </p>
             )}
 
-            <div className="flex gap-2">
-              <Label htmlFor="examDate">試験日：</Label>
+            <div className="flex items-center gap-2">
+              <Label htmlFor="examDate" className="w-28 shrink-0">
+                試験日：
+              </Label>
               <Input
                 id="examDate"
+                type="date"
                 disabled={isSubmitting}
-                placeholder="MM / DD"
+                className="flex-1"
                 {...register('examDate')}
               />
             </div>
@@ -95,12 +109,17 @@ export const GoalNameSetting = () => {
               <p className="text-sm text-red-500">{errors.examDate.message}</p>
             )}
 
-            <div className="flex gap-2">
-              <Label htmlFor="targetStudyTime">目標学習時間：</Label>
+            <div className="flex items-center gap-2">
+              <Label htmlFor="targetStudyTime" className="w-28 shrink-0">
+                目標学習時間：
+              </Label>
               <Input
                 id="targetStudyTime"
+                type="number"
+                min={0}
                 disabled={isSubmitting}
-                placeholder="300h"
+                placeholder="300"
+                className="flex-1"
                 {...register('targetStudyTime')}
               />
             </div>
@@ -110,9 +129,11 @@ export const GoalNameSetting = () => {
               </p>
             )}
 
-            <Button disabled={isSubmitting} type="submit" className="shrink-0">
-              {isSubmitting ? '更新中...' : '更新'}
-            </Button>
+            <div className="flex justify-end">
+              <Button disabled={isSubmitting} type="submit">
+                {isSubmitting ? '更新中...' : '更新'}
+              </Button>
+            </div>
           </form>
         )}
       </CardContent>
