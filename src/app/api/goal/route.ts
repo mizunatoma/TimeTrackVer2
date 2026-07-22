@@ -19,8 +19,13 @@ export const GET = async () => {
     }
 
     const goal = await goalService.findOne(profile.id)
+    const restDays = await goalService.calculateRemainingDays(profile.id)
+    const streak = await goalService.getStreak(profile.id)
 
-    return NextResponse.json<GoalResponse>({ goal }, { status: 200 })
+    return NextResponse.json<GoalResponse>(
+      { goal, restDays, streak },
+      { status: 200 },
+    )
   } catch (e) {
     logger.error('GET /goal error', {
       error: e instanceof Error ? e.stack : String(e),

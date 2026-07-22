@@ -139,4 +139,8 @@ export type GoalDTO = {
 }
 
 // GET, PUT /api/goal
-export type GoalResponse = { goal: GoalDTO | null }
+export type GoalResponse = {
+  goal: GoalDTO | null
+  restDays?: number | null
+  streak?: number | null
+}
