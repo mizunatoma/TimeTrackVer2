@@ -22,4 +22,16 @@ export const analyticsRepository = {
     })
     return timeLogs
   },
+
+  async findLogDatesByProfile(profileId: string, from: Date, to: Date) {
+    const timeLogs = await prisma.timeLog.findMany({
+      where: {
+        activity: { profileId },
+        endAt: { gte: from, lte: to },
+      },
+      select: { startAt: true }, // 日付判定だけなので必要最小限のフィールドに絞る
+      orderBy: { startAt: 'asc' },
+    })
+    return timeLogs
+  },
 }

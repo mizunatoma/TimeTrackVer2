@@ -12,7 +12,7 @@ export const POST = async () => {
 
     if (auth.isGuest) {
       return NextResponse.json(
-        { error: 'LINE連携は通常アカウントでご利用いただけます' },
+        { error: 'Authorization failure' },
         { status: 403 },
       )
     }
