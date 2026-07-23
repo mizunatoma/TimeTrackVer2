@@ -1,20 +1,12 @@
 'use client'
 import { toJstParts } from '@/app/_utils/format'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { GetAnalyticsResponse, GoalResponse } from '@/types/api'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
-import dynamic from 'next/dynamic'
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import AnalyticsData from '../_components/AnalyticsData'
 import GoalCard from '../_components/GoalCard'
 import Skelton from '../_components/Skelton'
 import { useFetch } from '../_hooks/useFetch'
-
-// 重いRechartsを初回バンドルから分離し、この画面を開いた時だけ読み込む（dynamic import）
-const AnalyticsCharts = dynamic(
-  () => import('../_components/AnalyticsCharts'),
-  { loading: () => <Skelton height="h-[300px]" /> },
-)
 
 export default function Page() {
   const [currentDate, setCurrentDate] = useState(new Date())
@@ -43,28 +35,6 @@ export default function Page() {
     setCurrentDate(nextDate)
   }
 
-  // useMemoで配列の同一性を保持。依存はdataのみ
-  // yAxisTicks, chartData ↓
-
-  // 全カテゴリの合計分数をもとに、棒グラフのY軸(h目盛り)の配列を作成
-  const yAxisTicks = useMemo(() => {
-    const allMinutes = data?.byCategory.map((c) => c.totalMinutes) ?? []
-    const maxMinutes = Math.max(0, ...allMinutes)
-    return Array.from(
-      { length: Math.ceil(maxMinutes / 60) + 1 },
-      (_, i) => i * 60,
-    )
-  }, [data])
-
-  // グラフ表示用データ
-  const chartData = useMemo(() => {
-    return (
-      data?.byCategory
-        .filter((c) => c.totalMinutes >= 1) // 0分は非表示
-        .sort((a, b) => b.totalMinutes - a.totalMinutes) ?? [] // 降順
-    )
-  }, [data])
-
   if (error || goalError) return <p>エラーが発生しました</p>
 
   return (
@@ -77,12 +47,6 @@ export default function Page() {
             <Skelton height="h-[300px]" />
           </div>
         </Skelton>
-      ) : data?.byCategory.length === 0 ? (
-        <Card className="flex h-[382px] flex-col justify-center gap-4">
-          <CardContent>
-            <p className="flex justify-center">この月の記録はありません</p>
-          </CardContent>
-        </Card>
       ) : (
         <>
           {/* 学習目標 */}
@@ -92,27 +56,14 @@ export default function Page() {
             </CardContent>
           </Card>
 
-          <Card>
-            {/* ナビゲーション < YYYY-MM > */}
-            <CardHeader>
-              <div className="flex items-center justify-center gap-2">
-                <button onClick={() => handleNavButton(-1)}>
-                  <ChevronLeft />
-                </button>
-                <CardTitle>
-                  {currentDate.getFullYear()}年 {currentDate.getMonth() + 1}月
-                </CardTitle>
-                <button onClick={() => handleNavButton(1)}>
-                  <ChevronRight />
-                </button>
-              </div>
-            </CardHeader>
-            {/* 学習統計 */}
-            <CardContent>
-              <AnalyticsData dateTo={dateTo} data={data} goalData={goalData} />
-              <AnalyticsCharts chartData={chartData} yAxisTicks={yAxisTicks} />
-            </CardContent>
-          </Card>
+          {/* 月次アナリティクス */}
+          <AnalyticsData
+            currentDate={currentDate}
+            onNavigate={handleNavButton}
+            dateTo={dateTo}
+            data={data}
+            goalData={goalData}
+          />
         </>
       )}
     </div>
