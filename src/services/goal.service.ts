@@ -63,10 +63,10 @@ export const goalService = {
     const todayJST = new Date(Date.now() + 9 * 60 * 60 * 1000)
       .toISOString() // → "2026-07-22T10:37:00.000Z"
       .split('T')[0] // → "2026-07-22"
-    const today = new Date(`${todayJST}T00:00:00+09:00`)
+    const today = new Date(`${todayJST}T23:59:59+09:00`)
 
     const from = new Date(today.getTime() - HISTORY_DAYS * MS_PER_DAY) // 100日前から
-    const to = today // today未満 = 今日を含まない
+    const to = today // 今日を含む
     const timeLogs = await analyticsRepository.findLogDatesByProfile(
       profileId,
       from,
@@ -85,10 +85,12 @@ export const goalService = {
     let streak = 0
     let cursor = new Date(todayJST) // "2026-07-22" を日付のみの文字列としてDate化(UTC 0時扱い)
 
+    const todayLog = today.toISOString().split('T')[0]
+    if (uniqueDates.has(todayLog)) streak++ // 今日のlogがあれば先にカウントする
+
     while (true) {
       cursor = new Date(cursor.getTime() - MS_PER_DAY) // 1日前へ (過去100日間のみ確認)
       const cursorStr = cursor.toISOString().split('T')[0]
-
       if (uniqueDates.has(cursorStr)) {
         streak++
       } else {

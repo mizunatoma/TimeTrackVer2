@@ -1,12 +1,14 @@
 'use client'
-import { formatMinutes, toJstParts } from '@/app/_utils/format'
-import { useFetch } from '@/app/user/_hooks/useFetch'
+import { toJstParts } from '@/app/_utils/format'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import type { GetAnalyticsResponse, GoalResponse } from '@/types/api'
+import { GetAnalyticsResponse, GoalResponse } from '@/types/api'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { useMemo, useState } from 'react'
+import AnalyticsData from '../_components/AnalyticsData'
+import GoalCard from '../_components/GoalCard'
 import Skelton from '../_components/Skelton'
+import { useFetch } from '../_hooks/useFetch'
 
 // 重いRechartsを初回バンドルから分離し、この画面を開いた時だけ読み込む（dynamic import）
 const AnalyticsCharts = dynamic(
@@ -63,36 +65,11 @@ export default function Page() {
     )
   }, [data])
 
-  const daysInMonth = Number(dateTo.slice(-2)) // 当月の日数
-  const sumTotalMinutes =
-    data?.byCategory.reduce((sum, item) => sum + item.totalMinutes, 0) ?? 0 // 記録総時間
-  const avgMinutes = Math.floor(sumTotalMinutes / daysInMonth) // 1日平均記録時間
-  const goalProgressPercent = goalData?.goal?.targetStudyTime
-    ? Math.round((sumTotalMinutes / (goalData.goal.targetStudyTime * 60)) * 100)
-    : '未設定'
-
   if (error || goalError) return <p>エラーが発生しました</p>
 
   return (
     <div className="flex flex-col gap-4 p-4">
-      {/* ナビゲーション < YYYY-MM > */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-center gap-2">
-            <button onClick={() => handleNavButton(-1)}>
-              <ChevronLeft />
-            </button>
-            <CardTitle>
-              {currentDate.getFullYear()}年 {currentDate.getMonth() + 1}月
-            </CardTitle>
-            <button onClick={() => handleNavButton(1)}>
-              <ChevronRight />
-            </button>
-          </div>
-        </CardHeader>
-      </Card>
-
-      {isLoading || isGoalLoading ? (
+      {isLoading || isGoalLoading || !data || !goalData ? (
         // スケルトンスクリーン シマーエフェクト
         <Skelton height="h-[382px]">
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -107,21 +84,36 @@ export default function Page() {
           </CardContent>
         </Card>
       ) : (
-        <Card>
-          <CardContent>
-            <div className="flex w-full items-center justify-center gap-4">
-              <p>総時間 : {formatMinutes(sumTotalMinutes)}</p>
-              <p>平均時間 : {formatMinutes(avgMinutes)} / 日</p>
-              <p>
-                目標達成率 :{' '}
-                {typeof goalProgressPercent === 'number'
-                  ? goalProgressPercent + '%'
-                  : goalProgressPercent}
-              </p>
-            </div>
-            <AnalyticsCharts chartData={chartData} yAxisTicks={yAxisTicks} />
-          </CardContent>
-        </Card>
+        <>
+          {/* 学習目標 */}
+          <Card>
+            <CardContent>
+              <GoalCard goalData={goalData} />
+            </CardContent>
+          </Card>
+
+          <Card>
+            {/* ナビゲーション < YYYY-MM > */}
+            <CardHeader>
+              <div className="flex items-center justify-center gap-2">
+                <button onClick={() => handleNavButton(-1)}>
+                  <ChevronLeft />
+                </button>
+                <CardTitle>
+                  {currentDate.getFullYear()}年 {currentDate.getMonth() + 1}月
+                </CardTitle>
+                <button onClick={() => handleNavButton(1)}>
+                  <ChevronRight />
+                </button>
+              </div>
+            </CardHeader>
+            {/* 学習統計 */}
+            <CardContent>
+              <AnalyticsData dateTo={dateTo} data={data} goalData={goalData} />
+              <AnalyticsCharts chartData={chartData} yAxisTicks={yAxisTicks} />
+            </CardContent>
+          </Card>
+        </>
       )}
     </div>
   )
