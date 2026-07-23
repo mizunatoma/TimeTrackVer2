@@ -41,12 +41,17 @@ export default function Page() {
     <div className="flex flex-col gap-4 p-4">
       {isLoading || isGoalLoading || !data || !goalData ? (
         // スケルトンスクリーン シマーエフェクト
-        <Skelton height="h-[382px]">
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <>
+          <Skelton height="h-[140px]" />
+          <Skelton height="h-[480px]">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+              <Skelton height="h-[70px]" />
+              <Skelton height="h-[70px]" />
+              <Skelton height="h-[70px]" />
+            </div>
             <Skelton height="h-[300px]" />
-            <Skelton height="h-[300px]" />
-          </div>
-        </Skelton>
+          </Skelton>
+        </>
       ) : (
         <>
           {/* 学習目標 */}

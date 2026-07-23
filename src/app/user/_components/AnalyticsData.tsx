@@ -63,36 +63,64 @@ export default function AnalyticsData({
       {/* ナビゲーション < YYYY-MM > */}
       <CardHeader>
         <div className="flex items-center justify-center gap-2">
-          <button onClick={() => onNavigate(-1)}>
-            <ChevronLeft />
+          <button
+            onClick={() => onNavigate(-1)}
+            className="rounded-full p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+          >
+            <ChevronLeft size={18} />
           </button>
-          <CardTitle>
+          <CardTitle className="text-base font-bold text-gray-800">
             {currentDate.getFullYear()}年 {currentDate.getMonth() + 1}月
           </CardTitle>
-          <button onClick={() => onNavigate(1)}>
-            <ChevronRight />
+          <button
+            onClick={() => onNavigate(1)}
+            className="rounded-full p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+          >
+            <ChevronRight size={18} />
           </button>
         </div>
       </CardHeader>
 
       <CardContent>
         {data.byCategory.length === 0 ? (
-          <p className="flex justify-center">この月の記録はありません</p>
+          <p className="flex justify-center py-8 text-sm text-gray-400">
+            この月の記録はありません
+          </p>
         ) : (
           <>
             {/* 学習時間統計 */}
-            <div className="flex w-full items-center justify-center gap-4">
-              <p>総時間 : {formatMinutes(sumTotalMinutes)}</p>
-              <p>平均時間 : {formatMinutes(avgMinutes)} / 日</p>
-              <p>
-                目標達成率 :{' '}
-                {typeof goalProgressPercent === 'number'
-                  ? goalProgressPercent + '%'
-                  : goalProgressPercent}
-              </p>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+              <div className="rounded-xl bg-gray-50 p-4">
+                <p className="text-xs text-gray-400">合計学習時間</p>
+                <p className="mt-1 text-xl font-medium text-gray-900">
+                  {formatMinutes(sumTotalMinutes)}
+                </p>
+              </div>
+              <div className="rounded-xl bg-gray-50 p-4">
+                <p className="text-xs text-gray-400">1日平均</p>
+                <p className="mt-1 text-xl font-medium text-gray-900">
+                  {formatMinutes(avgMinutes)}
+                </p>
+              </div>
+              <div className="rounded-xl bg-gray-50 p-4">
+                <p className="text-xs text-gray-400">目標達成率</p>
+                <p className="mt-1 text-xl font-medium text-gray-900">
+                  {typeof goalProgressPercent === 'number'
+                    ? goalProgressPercent + '%'
+                    : goalProgressPercent}
+                </p>
+              </div>
             </div>
+
             {/* グラフ */}
-            <AnalyticsCharts chartData={chartData} yAxisTicks={yAxisTicks} />
+            <div className="mt-6">
+              <div className="mb-2 flex items-center justify-between">
+                <p className="text-sm font-bold text-gray-800">
+                  カテゴリ別学習時間
+                </p>
+              </div>
+              <AnalyticsCharts chartData={chartData} yAxisTicks={yAxisTicks} />
+            </div>
           </>
         )}
       </CardContent>
